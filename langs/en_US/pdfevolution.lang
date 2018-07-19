@@ -5,3 +5,9 @@ ATMAbout = This module has been developed by <a href="http://www.atm-consulting.
 
 pdfevolutionSetup = pdfevolution module setup
 pdfevolutionAbout = About pdfevolution
+
+
+
+PDFSpongeDescription=Invoice PDF template Sponge. A complete invoice template (recommended Template)
+PDFEratostheneDescription=A complete order model (logo...)(recommended Template)
+DocModelCyanDescription=A complete proposal model (logo...)(recommended Template)
