@@ -16,6 +16,8 @@ DocModelCyanDescription=Modèle pdf Cyan. Modèle de Proposition commerciale PDF
 ParamLabel=Nom du paramètre
 ParamDesc=Une description si besoin
 ParamHelp=Le contenu de l'aide
+PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT=Ajouter une colonne prix unitaire après remise 
+UnitPriceAfterDiscount=P.U. HT R.
 
 # MENU
 TopMenupdfevolution=pdfevolution

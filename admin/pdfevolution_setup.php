@@ -104,13 +104,13 @@ print '<table class="noborder" width="100%">';
 _print_title("Parameters");
 
 // Example with a yes / no select
-_print_on_off('CONSTNAME', 'ParamLabel' , 'ParamDesc');
+_print_on_off('PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT');
 
 // Example with imput
-_print_input_form_part('CONSTNAME', 'ParamLabel');
+//_print_input_form_part('CONSTNAME', 'ParamLabel');
 
 // Example with color
-_print_input_form_part('CONSTNAME', 'ParamLabel', 'ParamDesc', array('type'=>'color'),'input','ParamHelp');
+//_print_input_form_part('CONSTNAME', 'ParamLabel', 'ParamDesc', array('type'=>'color'),'input','ParamHelp');
 
 // Example with placeholder
 //_print_input_form_part('CONSTNAME','ParamLabel','ParamDesc',array('placeholder'=>'http://'),'input','ParamHelp');

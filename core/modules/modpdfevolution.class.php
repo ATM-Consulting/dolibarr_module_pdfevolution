@@ -92,6 +92,7 @@ class modpdfevolution extends DolibarrModules
 		//                        );
 		$this->module_parts = array(
 		    'models' => 1, // Set this to 1 if module has its own models directory (core/modules/xxx)
+		    'hooks' => array('pdfgeneration'),
 		);
 
 		// Data directories to create when module is enabled.
