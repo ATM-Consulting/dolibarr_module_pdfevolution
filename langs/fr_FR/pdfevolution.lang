@@ -41,6 +41,11 @@ Nopdfevolution=(vide)
 Newpdfevolution=Création pdfevolution
 pdfevolutionCard=Fiche pdfevolution
 
+#PDF
+SituationTotalRayToRest=Reste à payer total HT
+PDFSituationTitle=Situation n° %d
+SituationTotalProgress=Total progression %d %%
+
 # CARD TPL
 Save=Enregistrer
 CreateDraft=Créer brouillon

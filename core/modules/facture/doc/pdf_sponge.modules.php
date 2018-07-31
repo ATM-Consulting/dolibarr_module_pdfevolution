@@ -1177,6 +1177,118 @@ class pdf_sponge extends ModelePDFFactures
 		$useborder=0;
 		$index = 0;
 
+		
+		
+		// pourcentage global d'avancement
+		$percent = 0;
+		$i=0;
+		foreach ($object->lines as $line)
+		{
+		    if(!class_exists('TSubtotal') || !TSubtotal::isModSubtotalLine($line)){
+		        $percent += $line->situation_percent;
+		        $i++;
+		    }
+		}
+		$avancementGlobal = $percent/$i;
+		
+		$object->fetchPreviousNextSituationInvoice();
+		$TPreviousIncoice = $object->tab_previous_situation_invoice;
+		
+		$total_a_payer = 0;
+		foreach ($TPreviousIncoice as &$fac) $total_a_payer += $fac->total_ht;
+		$total_a_payer += $object->total_ht;
+		$total_a_payer = $total_a_payer * 100 / $avancementGlobal;
+		
+		$deja_paye = 0;
+		$i = 1;
+		if(!empty($TPreviousIncoice)){
+		    
+		    $pdf->setY($tab2_top);
+		    $posy = $pdf->GetY();
+		    
+		    
+		    
+		    
+		    foreach ($TPreviousIncoice as &$fac){
+		        
+		        if($posy  > $this->page_hauteur - 4 ) {
+		            $this->_pagefoot($pdf,$object,$outputlangs,1);
+		            $pdf->addPage();
+		            $pdf->setY($this->marge_haute);
+		            $posy = $pdf->GetY();
+		        }
+		        
+		        // cumul TVA précédent
+		        $index++;
+		        $pdf->SetFillColor(255,255,255);
+		        $pdf->SetXY($col1x, $posy);
+		        $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("PDFSituationTitle", $fac->situation_counter).' '.$outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
+		        
+		        $pdf->SetXY($col2x,$posy);
+		        
+		        $facSign = '';
+		        if($i>1){
+		          $facSign = $fac->total_ht>=0?'+':'';
+		        }
+		        
+		        $displayAmount = ' '.$facSign.' '.price($fac->total_ht, 0, $outputlangs);
+		        
+		        $pdf->MultiCell($largcol2, $tab2_hl, $displayAmount, 0, 'R', 1);
+		        
+		        $i++;
+		        $deja_paye += $fac->total_ht;
+		        $posy += $tab2_hl;
+		        
+		        $pdf->setY($posy);
+		        
+		    }
+		    
+		    // Display curent total
+		    $pdf->SetFillColor(255,255,255);
+		    $pdf->SetXY($col1x, $posy);
+		    $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("PDFSituationTitle", $object->situation_counter).' '.$outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
+		    
+		    $pdf->SetXY($col2x,$posy);
+		    $facSign = '';
+		    if($i>1){
+		        $facSign = $object->total_ht>=0?'+':''; // gestion d'un cas particulier client
+		    }
+		    
+		    if($fac->type === facture::TYPE_CREDIT_NOTE){
+		        $facSign = '-'; // les avoirs
+		    }
+		    
+		    
+		    $displayAmount = ' '.$facSign.' '.price($object->total_ht, 0, $outputlangs);
+		    $pdf->MultiCell($largcol2, $tab2_hl, $displayAmount, 0, 'R', 1);
+		    
+		    $posy += $tab2_hl;
+		    
+		    // Display all total
+		    $pdf->SetFont('','', $default_font_size - 1);
+		    $pdf->SetFillColor(255,255,255);
+		    $pdf->SetXY($col1x, $posy);
+		    $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("SituationTotalProgress", $avancementGlobal), 0, 'L', 1);
+		    
+		    $pdf->SetXY($col2x,$posy);
+		    $pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer*$avancementGlobal/100, 0, $outputlangs), 0, 'R', 1);
+		    $pdf->SetFont('','', $default_font_size - 2);
+		    
+		    $posy += $tab2_hl;
+		    
+		    if($posy  > $this->page_hauteur - 4 ) {
+		        $pdf->addPage();
+		        $pdf->setY($this->marge_haute);
+		        $posy = $pdf->GetY();
+		    }
+		    
+		    $tab2_top = $posy;
+		    $index=0;
+		    
+		}
+		
+		$tab2_top += 3;
+		
 		// Total HT
 		$pdf->SetFillColor(255,255,255);
 		$pdf->SetXY($col1x, $tab2_top + 0);
@@ -1403,6 +1515,23 @@ class pdf_sponge extends ModelePDFFactures
 
 				$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
 				$pdf->MultiCell($largcol2, $tab2_hl, price($sign * $total_ttc, 0, $outputlangs), $useborder, 'R', 1);
+				
+				
+				if($object->type == Facture::TYPE_SITUATION)
+				{
+				    // reste à payer total
+				    $index++;
+				    
+				    $pdf->SetFont('','', $default_font_size - 1);
+				    $pdf->SetFillColor(255,255,255);
+				    $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
+				    $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities('SituationTotalRayToRest'), 0, 'L', 1);
+				    
+				    $total_ht = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1 ? $object->multicurrency_total_ht : $object->total_ht);
+				    $pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
+				    $pdf->MultiCell($largcol2, $tab2_hl, price($total_a_payer-$deja_paye-$object->total_ht, 0, $outputlangs), 0, 'R', 1);
+				}
+				
 			}
 		}
 
