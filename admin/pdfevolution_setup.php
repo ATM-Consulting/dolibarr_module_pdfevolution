@@ -106,6 +106,21 @@ _print_title("Parameters");
 // Example with a yes / no select
 _print_on_off('PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT');
 
+
+
+
+
+
+_print_on_off('PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_DISCOUNT');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_UNIT');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_PROGRESS');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_QTY');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_SUBPRICE');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_VAT');
+_print_on_off('PDFEVOLUTION_DISABLE_COL_PHOTO');
+
+
 // Example with imput
 //_print_input_form_part('CONSTNAME', 'ParamLabel');
 

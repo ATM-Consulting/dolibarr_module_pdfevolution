@@ -19,6 +19,15 @@ ParamHelp=Le contenu de l'aide
 PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT=Ajouter une colonne prix unitaire après remise 
 UnitPriceAfterDiscount=P.U. HT R.
 
+PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX=Ne pas afficher la colonne "Total HT"
+PDFEVOLUTION_DISABLE_COL_DISCOUNT=Ne pas afficher la colonne "Reduction"
+PDFEVOLUTION_DISABLE_COL_UNIT=Ne pas afficher la colonne "Unité"
+PDFEVOLUTION_DISABLE_COL_PROGRESS=Ne pas afficher la colonne "Progression" sur les facture de situation
+PDFEVOLUTION_DISABLE_COL_QTY=Ne pas afficher la colonne "Quantité"
+PDFEVOLUTION_DISABLE_COL_SUBPRICE=Ne pas afficher la colonne "Prix unitaire"
+PDFEVOLUTION_DISABLE_COL_VAT=Ne pas afficher la colonne "TVA"
+PDFEVOLUTION_DISABLE_COL_PHOTO=Ne pas afficher la colonne "Photo"
+
 # MENU
 TopMenupdfevolution=pdfevolution
 

@@ -84,7 +84,52 @@ class Actionspdfevolution
             }
             
             $pdfDoc->insertNewColumnDef('UnitPriceAfterDiscount', $def, 'discount',1);
+            
+           
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX)){
+                $pdfDoc->cols['totalexcltax']['status'] = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_DISCOUNT)){
+                $pdfDoc->cols['discount']['status']     = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_UNIT)){
+                $pdfDoc->cols['unit']['status']         = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_PROGRESS)){
+                $pdfDoc->cols['progress']['status']     = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_QTY)){
+                $pdfDoc->cols['qty']['status']          = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_SUBPRICE)){
+                $pdfDoc->cols['subprice']['status']     = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_VAT)){
+                $pdfDoc->cols['vat']['status']          = false;
+            }
+            
+            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_PHOTO)){
+                $pdfDoc->cols['photo']['status']        = false;
+            }
+            
+            
+            
+            
+            
+            
+            
+            
         }
+        
+        
+        
         
     }
     
