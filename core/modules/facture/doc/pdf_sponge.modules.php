@@ -1189,7 +1189,12 @@ class pdf_sponge extends ModelePDFFactures
 		        $i++;
 		    }
 		}
-		$avancementGlobal = $percent/$i;
+		if(!empty($i)){
+		  $avancementGlobal = $percent/$i;
+		}
+		else{
+		    $avancementGlobal = 0;
+		}
 		
 		$object->fetchPreviousNextSituationInvoice();
 		$TPreviousIncoice = $object->tab_previous_situation_invoice;
@@ -1197,7 +1202,13 @@ class pdf_sponge extends ModelePDFFactures
 		$total_a_payer = 0;
 		foreach ($TPreviousIncoice as &$fac) $total_a_payer += $fac->total_ht;
 		$total_a_payer += $object->total_ht;
-		$total_a_payer = $total_a_payer * 100 / $avancementGlobal;
+		
+		if(!empty($avancementGlobal)){
+		    $total_a_payer = $total_a_payer * 100 / $avancementGlobal;
+		}
+		else{
+		    $total_a_payer = 0;
+		}
 		
 		$deja_paye = 0;
 		$i = 1;
