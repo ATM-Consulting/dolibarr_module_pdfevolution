@@ -144,6 +144,11 @@ class pdf_cyan extends ModelePDFPropales
 		$outputlangs->load("products");
 
 		$nblignes = count($object->lines);
+		
+		$hidetop=0;
+		if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE)){
+		    $hidetop=$conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE;
+		}
 
 		// Loop on each lines to detect if there is at least one image to show
 		$realpatharray=array();
@@ -701,7 +706,7 @@ class pdf_cyan extends ModelePDFPropales
 						$pdf->setPage($pagenb);
 						if ($pagenb == $pageposbeforeprintlines)
 						{
-							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, 0, 1, $object->multicurrency_code);
+						    $this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, $hidetop, 1, $object->multicurrency_code);
 						}
 						else
 						{
@@ -717,7 +722,7 @@ class pdf_cyan extends ModelePDFPropales
 					{
 					    if ($pagenb == $pageposafter)
 						{
-							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, 0, 1, $object->multicurrency_code);
+						    $this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, $hidetop, 1, $object->multicurrency_code);
 						}
 						else
 						{
@@ -735,7 +740,7 @@ class pdf_cyan extends ModelePDFPropales
 				// Show square
 				if ($pagenb == $pageposbeforeprintlines)
 				{
-					$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforsignature - $heightforfooter, 0, $outputlangs, 0, 0, $object->multicurrency_code);
+				    $this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforsignature - $heightforfooter, 0, $outputlangs, $hidetop, 0, $object->multicurrency_code);
 					$bottomlasttab=$this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforsignature - $heightforfooter + 1;
 				}
 				else

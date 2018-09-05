@@ -168,6 +168,11 @@ class pdf_eratosthene extends ModelePDFCommandes
 		$outputlangs->loadLangs(array("main", "dict", "companies", "bills", "products", "orders", "deliveries"));
 
 		$nblignes = count($object->lines);
+		
+		$hidetop=0;
+		if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE)){
+		    $hidetop=$conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE;
+		}
 
 		if ($conf->commande->dir_output)
 		{
@@ -625,7 +630,7 @@ class pdf_eratosthene extends ModelePDFCommandes
 						$pdf->setPage($pagenb);
 						if ($pagenb == $pageposbeforeprintlines)
 						{
-							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, 0, 1, $object->multicurrency_code);
+						    $this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, $hidetop, 1, $object->multicurrency_code);
 						}
 						else
 						{
@@ -641,7 +646,7 @@ class pdf_eratosthene extends ModelePDFCommandes
 					{
 					    if ($pagenb == $pageposafter)
 						{
-							$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, 0, 1, $object->multicurrency_code);
+						    $this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforfooter, 0, $outputlangs, $hidetop, 1, $object->multicurrency_code);
 						}
 						else
 						{
@@ -658,7 +663,7 @@ class pdf_eratosthene extends ModelePDFCommandes
 
 				// Show square
 				if ($pagenb == $pageposbeforeprintlines)
-					$this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputlangs, 0, 0, $object->multicurrency_code);
+				    $this->_tableau($pdf, $tab_top, $this->page_hauteur - $tab_top - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputlangs, $hidetop, 0, $object->multicurrency_code);
 				else
 					$this->_tableau($pdf, $tab_top_newpage, $this->page_hauteur - $tab_top_newpage - $heightforinfotot - $heightforfreetext - $heightforfooter, 0, $outputlangs, 1, 0, $object->multicurrency_code);
 				$bottomlasttab=$this->page_hauteur - $heightforinfotot - $heightforfreetext - $heightforfooter + 1;

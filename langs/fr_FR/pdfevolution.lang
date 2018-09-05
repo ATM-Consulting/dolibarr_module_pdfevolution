@@ -27,6 +27,7 @@ PDFEVOLUTION_DISABLE_COL_QTY=Ne pas afficher la colonne "Quantité"
 PDFEVOLUTION_DISABLE_COL_SUBPRICE=Ne pas afficher la colonne "Prix unitaire"
 PDFEVOLUTION_DISABLE_COL_VAT=Ne pas afficher la colonne "TVA"
 PDFEVOLUTION_DISABLE_COL_PHOTO=Ne pas afficher la colonne "Photo"
+PDFEVOLUTION_DISABLE_COL_HEAD_TITLE=Ne pas afficher la ligne de titre des colonnes
 
 # MENU
 TopMenupdfevolution=pdfevolution

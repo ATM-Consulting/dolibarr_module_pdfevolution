@@ -106,10 +106,11 @@ _print_title("Parameters");
 // Example with a yes / no select
 _print_on_off('PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT');
 
+// MAIN_PDF_DASH_BETWEEN_LINES set to 0 to desable dash line separator
 
 
 
-
+_print_on_off('PDFEVOLUTION_DISABLE_COL_HEAD_TITLE');
 
 _print_on_off('PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX');
 _print_on_off('PDFEVOLUTION_DISABLE_COL_DISCOUNT');
