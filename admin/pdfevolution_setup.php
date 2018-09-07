@@ -109,9 +109,31 @@ print '</table>';
 _updateBtn();
 print ('<br/><br/>');
 
-$Tcol = array(
-    'PHOTO', 'VAT',  'SUBPRICE', 'DISCOUNT', 'UNIT_PRICE_AFTER_DISCOUNT', 'UNIT', 'PROGRESS', 'QTY','TOTALEXCLTAX'
-); 
+$Tcol = array();
+
+     
+
+if (! empty($conf->global->MAIN_GENERATE_INVOICES_WITH_PICTURE) && !empty($this->atleastonephoto))
+{
+    $Tcol[] = 'PHOTO';
+}
+
+if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN))
+{
+    $Tcol[] = 'VAT';
+}
+
+$Tcol[] = 'SUBPRICE';
+$Tcol[] = 'DISCOUNT';
+$Tcol[] = 'UNIT_PRICE_AFTER_DISCOUNT';
+
+if($conf->global->PRODUCT_USE_UNITS){
+    $Tcol[] = 'UNIT';
+}
+
+$Tcol[] = 'PROGRESS';
+$Tcol[] = 'QTY';
+$Tcol[] = 'TOTALEXCLTAX';
 
 print '<table class="noborder" width="100%">';
 
