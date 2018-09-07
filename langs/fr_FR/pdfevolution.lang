@@ -29,6 +29,17 @@ PDFEVOLUTION_DISABLE_COL_VAT=Ne pas afficher la colonne "TVA"
 PDFEVOLUTION_DISABLE_COL_PHOTO=Ne pas afficher la colonne "Photo"
 PDFEVOLUTION_DISABLE_COL_HEAD_TITLE=Ne pas afficher la ligne de titre des colonnes
 
+EnableCol=Afficher la colonne
+DisplaySeparator=Afficher la ligne de separation
+PHOTO=Photo
+SUBPRICE=Prix unitaire
+DISCOUNT=Remise
+UNIT_PRICE_AFTER_DISCOUNT=Prix unitaire avec remise
+UNIT=Unité
+PROGRESS=Progression
+TOTALEXCLTAX=Total HT
+QTY=Quantité
+
 # MENU
 TopMenupdfevolution=pdfevolution
 

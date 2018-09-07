@@ -120,9 +120,16 @@ class Actionspdfevolution
             }
             
             
+            $Tcol = array(
+                'TOTALEXCLTAX', 'DISCOUNT', 'UNIT_PRICE_AFTER_DISCOUNT', 'UNIT', 'PROGRESS', 'QTY', 'SUBPRICE', 'VAT', 'PHOTO'
+            ); 
             
-            
-            
+            foreach ($Tcol as $col){
+                $constUsed = 'PDFEVOLUTION_DISABLE_LEFT_SEP_'.$col;
+                if(!empty($conf->global->{$constUsed})){
+                    $pdfDoc->cols[strtolower($col)]['border-left']        = false;
+                }
+            }
             
             
             

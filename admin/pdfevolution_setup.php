@@ -42,37 +42,15 @@ if (! $user->admin) {
 
 // Parameters
 $action = GETPOST('action', 'alpha');
+$value = GETPOST('value','alpha');
+$label = GETPOST('label','alpha');
+
 
 /*
  * Actions
  */
-if (preg_match('/set_(.*)/',$action,$reg))
-{
-	$code=$reg[1];
-	if (dolibarr_set_const($db, $code, GETPOST($code), 'chaine', 0, '', $conf->entity) > 0)
-	{
-		header("Location: ".$_SERVER["PHP_SELF"]);
-		exit;
-	}
-	else
-	{
-		dol_print_error($db);
-	}
-}
-	
-if (preg_match('/del_(.*)/',$action,$reg))
-{
-	$code=$reg[1];
-	if (dolibarr_del_const($db, $code, 0) > 0)
-	{
-		Header("Location: ".$_SERVER["PHP_SELF"]);
-		exit;
-	}
-	else
-	{
-		dol_print_error($db);
-	}
-}
+
+include DOL_DOCUMENT_ROOT.'/core/actions_setmoduleoptions.inc.php';
 
 /*
  * View
@@ -98,28 +76,20 @@ dol_fiche_head(
 // Setup page goes here
 $form=new Form($db);
 $var=false;
-print '<table class="noborder" width="100%">';
 
 
-_print_title("Parameters");
 
-// Example with a yes / no select
-_print_on_off('PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT');
+print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+
+
 
 // MAIN_PDF_DASH_BETWEEN_LINES set to 0 to desable dash line separator
 
 
+print '<table class="noborder" width="100%">';
 
 _print_on_off('PDFEVOLUTION_DISABLE_COL_HEAD_TITLE');
-
-_print_on_off('PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_DISCOUNT');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_UNIT');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_PROGRESS');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_QTY');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_SUBPRICE');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_VAT');
-_print_on_off('PDFEVOLUTION_DISABLE_COL_PHOTO');
 
 
 // Example with imput
@@ -134,8 +104,72 @@ _print_on_off('PDFEVOLUTION_DISABLE_COL_PHOTO');
 // Example with textarea
 //_print_input_form_part('CONSTNAME','ParamLabel','ParamDesc',array(),'textarea');
 
+print '</table>';
+
+_updateBtn();
+print ('<br/><br/>');
+
+$Tcol = array(
+    'PHOTO', 'VAT',  'SUBPRICE', 'DISCOUNT', 'UNIT_PRICE_AFTER_DISCOUNT', 'UNIT', 'PROGRESS', 'QTY','TOTALEXCLTAX'
+); 
+
+print '<table class="noborder" width="100%">';
+
+
+print '<thead>';
+print '<tr>';
+print '<th class="left"  >'.$langs->trans('Parameters').'</th>';
+foreach ($Tcol as $col){
+    print '<th class="center"  >'.$langs->trans($col).'</th>';
+}
+print '</tr>';
+print '</thead>';
+
+print '<tbody>';
+
+print '<tr class="oddeven" >';
+print '<td  >'.$langs->trans('EnableCol').'</td>';
+foreach ($Tcol as $col){
+    $revertonoff = 1;
+    $constUsed = 'PDFEVOLUTION_DISABLE_COL_'.$col;
+    
+    if('UNIT_PRICE_AFTER_DISCOUNT' === $col){
+        $revertonoff = 0;
+        $constUsed = 'PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT';
+    }
+    
+    print '<td class="center" >'.ajax_constantonoff($constUsed, array(), null, $revertonoff).'</td>';
+}
+print '</tr>';
+
+
+print '<tr class="oddeven" >';
+print '<td  >'.$langs->trans('DisplaySeparator').'</td>';
+foreach ($Tcol as $col){
+    $revertonoff = 1;
+    $constUsed = 'PDFEVOLUTION_DISABLE_LEFT_SEP_'.$col;
+    print '<td class="center" >'.ajax_constantonoff($constUsed, array(), null, $revertonoff).'</td>';
+}
+print '</tr>';
+
+
+
+
+print '</tbody>';
+
+//_print_input_form_part($confkey, $title = false, $desc ='', $metas = array(), $type='input', $help = false, $printTableRow = true)
+
+
+
 
 print '</table>';
+
+
+
+_updateBtn();
+
+print '</form>';
+
 
 llxFooter();
 
@@ -143,21 +177,19 @@ $db->close();
 
 
 
-function _print_title($title="")
-{
+function _updateBtn(){
     global $langs;
-    print '<tr class="liste_titre">';
-    print '<td>'.$langs->trans($title).'</td>'."\n";
-    print '<td align="center" width="20">&nbsp;</td>';
-    print '<td align="center" ></td>'."\n";
-    print '</tr>';
+    print '<div style="text-align: right;" >';
+    print '<input type="submit" class="butAction" value="'.$langs->trans("Save").'">';
+    print '</div>';
 }
+
+
 
 function _print_on_off($confkey, $title = false, $desc ='')
 {
-    global $var, $bc, $langs, $conf;
+    global $var, $bc, $langs;
     $var=!$var;
-    
     print '<tr '.$bc[$var].'>';
     print '<td>'.($title?$title:$langs->trans($confkey));
     if(!empty($desc))
@@ -166,24 +198,21 @@ function _print_on_off($confkey, $title = false, $desc ='')
     }
     print '</td>';
     print '<td align="center" width="20">&nbsp;</td>';
-    print '<td align="center" width="300">';
-    print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-    print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-    print '<input type="hidden" name="action" value="set_'.$confkey.'">';
+    print '<td align="right" width="300">';
     print ajax_constantonoff($confkey);
-    print '</form>';
     print '</td></tr>';
 }
 
-function _print_input_form_part($confkey, $title = false, $desc ='', $metas = array(), $type='input', $help = false)
+
+function _print_input_form_part($confkey, $title = false, $desc ='', $metas = array(), $type='input', $help = false, $printTableRow = true)
 {
-    global $var, $bc, $langs, $conf, $db;
+    global $var, $bc, $langs, $conf, $db, $inputCount;
     $var=!$var;
-    
+    $inputCount = empty($inputCount)?1:($inputCount+1);
     $form=new Form($db);
     
     $defaultMetas = array(
-        'name' => $confkey
+        'name' => 'value'.$inputCount
     );
     
     if($type!='textarea'){
@@ -199,27 +228,32 @@ function _print_input_form_part($confkey, $title = false, $desc ='', $metas = ar
         $metascompil .= ' '.$key.'="'.$values.'" ';
     }
     
-    print '<tr '.$bc[$var].'>';
-    print '<td>';
     
-    if(!empty($help)){
-        print $form->textwithtooltip( ($title?$title:$langs->trans($confkey)) , $langs->trans($help),2,1,img_help(1,''));
-    }
-    else {
-        print $title?$title:$langs->trans($confkey);
-    }
-    
-    if(!empty($desc))
+    if($printTableRow)
     {
-        print '<br><small>'.$langs->trans($desc).'</small>';
+        print '<tr '.$bc[$var].'>';
+        print '<td>';
+        
+        if(!empty($help)){
+            print $form->textwithtooltip( ($title?$title:$langs->trans($confkey)) , $langs->trans($help),2,1,img_help(1,''));
+        }
+        else {
+            print $title?$title:$langs->trans($confkey);
+        }
+        
+        if(!empty($desc))
+        {
+            print '<br><small>'.$langs->trans($desc).'</small>';
+        }
+        
+        print '</td>';
+        print '<td align="center" width="20">&nbsp;</td>';
+        print '<td align="right" width="300">';
     }
+        
+    print '<input type="hidden" name="param'.$inputCount.'" value="'.$confkey.'">';
     
-    print '</td>';
-    print '<td align="center" width="20">&nbsp;</td>';
-    print '<td align="right" width="300">';
-    print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-    print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-    print '<input type="hidden" name="action" value="set_'.$confkey.'">';
+    print '<input type="hidden" name="action" value="setModuleOptions">';
     if($type=='textarea'){
         print '<textarea '.$metascompil.'  >'.dol_htmlentities($conf->global->{$confkey}).'</textarea>';
     }
@@ -227,7 +261,7 @@ function _print_input_form_part($confkey, $title = false, $desc ='', $metas = ar
         print '<input '.$metascompil.'  />';
     }
     
-    print '<input type="submit" class="butAction" value="'.$langs->trans("Modify").'">';
-    print '</form>';
-    print '</td></tr>';
+    if($printTableRow){
+        print '</td></tr>';
+    }
 }
