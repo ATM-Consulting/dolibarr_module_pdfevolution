@@ -95,7 +95,7 @@ class modpdfevolution extends DolibarrModules
 		    'models' => 0 // Set this to 1 if module has its own models directory (core/modules/xxx)
 		);
 		
-		if(floatval(DOL_VERSION) < 8){
+		if(floatval(DOL_VERSION) < 9){
 		  $this->module_parts['models'] = 1; // Set this to 1 if module has its own models directory (core/modules/xxx)
 		}
 
