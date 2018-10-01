@@ -76,3 +76,9 @@ Modify=Modifier
 Reopen=Rouvrir
 ToClone=Cloner
 Delete=Supprimer
+
+# Retained warranty
+PDFEVOLToPayOn=A payer le %s
+PDFEVOLtoPayOn=à payer le %s
+PDFEVOLRetainedWarranty=Retenue de garantie
+
