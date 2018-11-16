@@ -1568,8 +1568,13 @@ class pdf_sponge extends ModelePDFFactures
 				// Retained warranty
 				if( !empty($object->situation_final) &&  ( $object->type == Facture::TYPE_SITUATION && (!empty($object->retained_warranty) ) ) )
 				{
+				    $displayWarranty = false;
 				    // Check if this situation invoice is 100% for real
-				    if(!empty($object->lines)){
+				    if(!empty($object->situation_final)){
+				        $displayWarranty = true;
+				    }
+				    elseif(!empty($object->lines) && $object->status == Facture::STATUS_DRAFT ){
+				        // $object->situation_final need validation to be done so this test is need for draft
 				        $displayWarranty = true;
 				        foreach( $object->lines as $i => $line ){
 				            if($line->product_type < 2 && $line->situation_percent < 100){
