@@ -73,7 +73,7 @@ class pdf_rivesaltes extends ModelePDFSuppliersOrders
 		$langs->loadLangs(array("main", "bills", "pdfevolution@pdfevolution"));
 
 		$this->db = $db;
-		$this->name = "Commande fournisseur";
+		$this->name = "Rivesaltes";
 		$this->description = $langs->trans('SuppliersCommandModel');
 
 		// Dimension page pour format A4
