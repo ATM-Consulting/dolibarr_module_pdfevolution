@@ -148,6 +148,9 @@ class pdf_sponge extends ModelePDFFactures
 		// Define position of columns
 		$this->posxdesc=$this->marge_gauche+1; // used for notes ans other stuff
 		
+		
+		$this->tabTitleHeight = 5; // default height
+
 		//  Use new system for position of columns, view  $this->defineColumnField() 
 
 		$this->tva=array();
@@ -522,13 +525,18 @@ class pdf_sponge extends ModelePDFFactures
 	                $height_note=0;
 	            }
 	            
-	            $iniY = $tab_top + 7;
-	            $curY = $tab_top + 7;
-	            $nexY = $tab_top + 7;
-	            
 	            // Use new auto collum system
 	            $this->prepareArrayColumnField($object,$outputlangs,$hidedetails,$hidedesc,$hideref);
 	            
+			// Simulation de tableau pour connaitre la hauteur de la ligne de titre
+			$pdf->startTransaction();
+			$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
+			$pdf->rollbackTransaction(true);
+			
+			$iniY = $tab_top + $this->tabTitleHeight + 2;
+			$curY = $tab_top + $this->tabTitleHeight + 2;
+			$nexY = $tab_top + $this->tabTitleHeight + 2;
+				
 	            // Loop on each lines
 	            $pageposbeforeprintlines=$pdf->getPage();
 	            $pagenb = $pageposbeforeprintlines;
@@ -1717,29 +1725,10 @@ class pdf_sponge extends ModelePDFFactures
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
 
-		foreach ($this->cols as $colKey => $colDef)
-		{
-		    if(!$this->getColumnStatus($colKey)) continue;
-		    
-		    // get title label
-		    $colDef['title']['label'] = !empty($colDef['title']['label'])?$colDef['title']['label']:$outputlangs->transnoentities($colDef['title']['textkey']);
-		    
-		    // Add column separator
-		    if(!empty($colDef['border-left'])){
-		        $pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $tab_height);
-		    }
-		    
-		    if (empty($hidetop))
-		    {
-		      $pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
-		    
-		      $textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
-		      $pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
-		    }
-		}
+		$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
 		
 		if (empty($hidetop)){
-			$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line prend une position y en 2eme param et 4eme param
+		    $pdf->line($this->marge_gauche, $tab_top+$this->tabTitleHeight, $this->page_largeur-$this->marge_droite, $tab_top+$this->tabTitleHeight);	// line prend une position y en 2eme param et 4eme param
 		}
 
 		
@@ -2465,4 +2454,57 @@ class pdf_sponge extends ModelePDFFactures
 	    }
 	    else  return  false;
 	}
+	
+	function pdfTabTitles(&$pdf, $tab_top, $tab_height, $outputlangs, $hidetop=0)
+	{
+	    global $hookmanager;
+	    
+	    foreach ($this->cols as $colKey => $colDef)
+	    {
+	        
+	        $parameters=array(
+	            'colKey' => $colKey,
+	            'pdf' => $pdf,
+	            'outputlangs' => $outputlangs,
+	            'tab_top' => $tab_top,
+	            'tab_height' => $tab_height,
+	            'hidetop' => $hidetop
+	        );
+	        
+	        $reshook=$hookmanager->executeHooks('pdfTabTitles',$parameters,$this);    // Note that $object may have been modified by hook
+	        if ($reshook < 0)
+	        {
+	            setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+	        }
+	        elseif (empty($reshook))
+	        {
+	            
+	            if(!$this->getColumnStatus($colKey)) continue;
+	            
+	            // get title label
+	            $colDef['title']['label'] = !empty($colDef['title']['label'])?$colDef['title']['label']:$outputlangs->transnoentities($colDef['title']['textkey']);
+	            
+	            // Add column separator
+	            if(!empty($colDef['border-left'])){
+	                $pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $tab_height);
+	            }
+	            
+	            if (empty($hidetop))
+	            {
+	                $pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
+	                
+	                $textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
+	                $pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
+	                
+	                $this->tabTitleHeight = max ($pdf->GetY()- $tab_top + $colDef['title']['padding'][2] , $this->tabTitleHeight );
+	                
+	            }
+	            
+	        }
+	    }
+	    
+	    
+	    return $this->tabTitleHeight;
+	}
+	
 }
