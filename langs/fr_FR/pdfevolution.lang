@@ -17,6 +17,8 @@ ParamLabel=Nom du paramètre
 ParamDesc=Une description si besoin
 ParamHelp=Le contenu de l'aide
 PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT=Ajouter une colonne prix unitaire après remise 
+MAIN_SHOW_AMOUNT_DISCOUNT=Afficher le montant des réductions dans la zone des totaux
+MAIN_SHOW_AMOUNT_BEFORE_DISCOUNT=Afficher le montant total avant réductions dans la zone des totaux
 UnitPriceAfterDiscount=P.U. HT R.
 
 PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX=Ne pas afficher la colonne "Total HT"
@@ -66,6 +68,11 @@ pdfevolutionCard=Fiche pdfevolution
 SituationTotalRayToRest=Reste à payer total HT
 PDFSituationTitle=Situation n° %d
 SituationTotalProgress=Total progression %d %%
+
+TotalDiscount = Total remise
+TotalHTBeforeDiscount = Total HT avant remise
+AmountHTBeforeDiscount = Montant HT avant remise
+AmountDiscount = Montant remise
 
 # CARD TPL
 Save=Enregistrer
