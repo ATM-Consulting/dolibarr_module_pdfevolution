@@ -34,6 +34,7 @@ require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/company.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
 require_once DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php';
+require_once __DIR__.'/../../../lib/pdf.lib.php'; // include lib not in current DOL_DOCUMENT_ROOT.'/core/lib/pdf.lib.php' for backward compatibility;
 
 
 /**
@@ -137,6 +138,8 @@ class pdf_eratosthene extends ModelePDFCommandes
 		// Define position of columns
 		$this->posxdesc=$this->marge_gauche+1;
 		
+
+		$this->tabTitleHeight = 5; // default height
 
 		$this->tva=array();
 		$this->localtax1=array();
@@ -437,12 +440,18 @@ class pdf_eratosthene extends ModelePDFCommandes
 					$height_note=0;
 				}
 
-				$iniY = $tab_top + 7;
-				$curY = $tab_top + 7;
-				$nexY = $tab_top + 7;
 				
 				// Use new auto collum system
 				$this->prepareArrayColumnField($object,$outputlangs,$hidedetails,$hidedesc,$hideref);
+				
+				// Simulation de tableau pour connaitre la hauteur de la ligne de titre
+				$pdf->startTransaction();
+				$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
+				$pdf->rollbackTransaction(true);
+				
+				$iniY = $tab_top + $this->tabTitleHeight + 2;
+				$curY = $tab_top + $this->tabTitleHeight + 2;
+				$nexY = $tab_top + $this->tabTitleHeight + 2;
 				
 				// Loop on each lines
 				$pageposbeforeprintlines=$pdf->getPage();
@@ -947,14 +956,44 @@ class pdf_eratosthene extends ModelePDFCommandes
 
 		$useborder=0;
 		$index = 0;
-
+		
+		// Get Total HT
+		$total_ht = ($conf->multicurrency->enabled && $object->mylticurrency_tx != 1 ? $object->multicurrency_total_ht : $object->total_ht);
+		
+		// Total remise
+		$total_line_remise=0;
+		foreach($object->lines as $i => $line) {
+		    $total_line_remise+= pdf_getLineTotalDiscountAmount($object,$i,$outputlangs,2); // TODO: add this methode to core/lib/pdf.lib
+		    // Gestion remise sous forme de ligne négative
+		    if($line->total_ht < 0) $total_line_remise += -$line->total_ht;
+		}
+		if($total_line_remise > 0) {
+		    if (! empty($conf->global->MAIN_SHOW_AMOUNT_DISCOUNT)) {
+		        $pdf->SetFillColor(255,255,255);
+		        $pdf->SetXY($col1x, $tab2_top + $tab2_hl);
+		        $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalDiscount"), 0, 'L', 1);
+		        $pdf->SetXY($col2x, $tab2_top + $tab2_hl);
+		        $pdf->MultiCell($largcol2, $tab2_hl, price($total_line_remise, 0, $outputlangs), 0, 'R', 1);
+		        
+		        $index++;
+		    }
+		    // Show total NET before discount
+		    if (! empty($conf->global->MAIN_SHOW_AMOUNT_BEFORE_DISCOUNT)) {
+		        $pdf->SetFillColor(255,255,255);
+		        $pdf->SetXY($col1x, $tab2_top + 0);
+		        $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalHTBeforeDiscount"), 0, 'L', 1);
+		        $pdf->SetXY($col2x, $tab2_top + 0);
+		        $pdf->MultiCell($largcol2, $tab2_hl, price($total_line_remise + $total_ht, 0, $outputlangs), 0, 'R', 1);
+		        
+		        $index++;
+		    }
+		}
 		// Total HT
 		$pdf->SetFillColor(255,255,255);
-		$pdf->SetXY($col1x, $tab2_top + 0);
+		$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalHT"), 0, 'L', 1);
 
-		$total_ht = ($conf->multicurrency->enabled && $object->mylticurrency_tx != 1 ? $object->multicurrency_total_ht : $object->total_ht);
-		$pdf->SetXY($col2x, $tab2_top + 0);
+		$pdf->SetXY($col2x, $tab2_top + $tab2_hl * $index);
 		$pdf->MultiCell($largcol2, $tab2_hl, price($total_ht + (! empty($object->remise)?$object->remise:0), 0, $outputlangs), 0, 'R', 1);
 
 		// Show VAT by rates and total
@@ -1222,29 +1261,10 @@ class pdf_eratosthene extends ModelePDFCommandes
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
 
-		foreach ($this->cols as $colKey => $colDef)
-		{
-		    if(!$this->getColumnStatus($colKey)) continue;
-		    
-		    // get title label
-		    $colDef['title']['label'] = !empty($colDef['title']['label'])?$colDef['title']['label']:$outputlangs->transnoentities($colDef['title']['textkey']);
-		    
-		    // Add column separator
-		    if(!empty($colDef['border-left'])){
-		        $pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $tab_height);
-		    }
-		    
-		    if (empty($hidetop))
-		    {
-		      $pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
-		    
-		      $textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
-		      $pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
-		    }
-		}
+		$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
 		
 		if (empty($hidetop)){
-			$pdf->line($this->marge_gauche, $tab_top+5, $this->page_largeur-$this->marge_droite, $tab_top+5);	// line prend une position y en 2eme param et 4eme param
+		    $pdf->line($this->marge_gauche, $tab_top+$this->tabTitleHeight, $this->page_largeur-$this->marge_droite, $tab_top+$this->tabTitleHeight);	// line prend une position y en 2eme param et 4eme param
 		}
 
 		
@@ -1909,4 +1929,57 @@ class pdf_eratosthene extends ModelePDFCommandes
 	    }
 	    else  return  false;
 	}
+	
+	function pdfTabTitles(&$pdf, $tab_top, $tab_height, $outputlangs, $hidetop=0)
+	{
+	    global $hookmanager;
+	    
+	    foreach ($this->cols as $colKey => $colDef)
+	    {
+	        
+	        $parameters=array(
+	            'colKey' => $colKey,
+	            'pdf' => $pdf,
+	            'outputlangs' => $outputlangs,
+	            'tab_top' => $tab_top,
+	            'tab_height' => $tab_height,
+	            'hidetop' => $hidetop
+	        );
+	        
+	        $reshook=$hookmanager->executeHooks('pdfTabTitles',$parameters,$this);    // Note that $object may have been modified by hook
+	        if ($reshook < 0)
+	        {
+	            setEventMessages($hookmanager->error, $hookmanager->errors, 'errors');
+	        }
+	        elseif (empty($reshook))
+	        {
+	            
+	            if(!$this->getColumnStatus($colKey)) continue;
+	            
+	            // get title label
+	            $colDef['title']['label'] = !empty($colDef['title']['label'])?$colDef['title']['label']:$outputlangs->transnoentities($colDef['title']['textkey']);
+	            
+	            // Add column separator
+	            if(!empty($colDef['border-left'])){
+	                $pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $tab_height);
+	            }
+	            
+	            if (empty($hidetop))
+	            {
+	                $pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
+	                
+	                $textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
+	                $pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
+	                
+	                $this->tabTitleHeight = max ($pdf->GetY()- $tab_top + $colDef['title']['padding'][2] , $this->tabTitleHeight );
+	                
+	            }
+	            
+	        }
+	    }
+	    
+	    
+	    return $this->tabTitleHeight;
+	}
+	
 }
