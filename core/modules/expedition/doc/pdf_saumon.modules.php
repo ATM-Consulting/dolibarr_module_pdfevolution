@@ -462,7 +462,7 @@ class pdf_saumon extends ModelePdfExpedition
 					
 					if ($this->getColumnStatus('qty_shipped'))
 					{
-					    $this->printStdColumnContent($pdf, $curY, 'qty_shipped', $object->lines[$i]->qty_asked);
+					    $this->printStdColumnContent($pdf, $curY, 'qty_shipped', $object->lines[$i]->qty_shipped);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
 					
