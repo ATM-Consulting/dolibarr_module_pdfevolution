@@ -176,6 +176,68 @@ class pdf_eratosthene extends ModelePDFCommandes
 		if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE)){
 		    $hidetop=$conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE;
 		}
+		
+		// Loop on each lines to detect if there is at least one image to show
+		$realpatharray=array();
+		$this->atleastonephoto = false;
+		if (! empty($conf->global->MAIN_GENERATE_ORDERS_WITH_PICTURE))
+		{
+		    $objphoto = new Product($this->db);
+		    
+		    for ($i = 0 ; $i < $nblignes ; $i++)
+		    {
+		        if (empty($object->lines[$i]->fk_product)) continue;
+		        
+		        $objphoto->fetch($object->lines[$i]->fk_product);
+		        //var_dump($objphoto->ref);exit;
+		        if (! empty($conf->global->PRODUCT_USE_OLD_PATH_FOR_PHOTO))
+		        {
+		            $pdir[0] = get_exdir($objphoto->id,2,0,0,$objphoto,'product') . $objphoto->id ."/photos/";
+		            $pdir[1] = get_exdir(0,0,0,0,$objphoto,'product') . dol_sanitizeFileName($objphoto->ref).'/';
+		        }
+		        else
+		        {
+		            $pdir[0] = get_exdir(0,0,0,0,$objphoto,'product') . dol_sanitizeFileName($objphoto->ref).'/';				// default
+		            $pdir[1] = get_exdir($objphoto->id,2,0,0,$objphoto,'product') . $objphoto->id ."/photos/";	// alternative
+		        }
+		        
+		        $arephoto = false;
+		        foreach ($pdir as $midir)
+		        {
+		            if (! $arephoto)
+		            {
+		                $dir = $conf->product->dir_output.'/'.$midir;
+		                
+		                foreach ($objphoto->liste_photos($dir,1) as $key => $obj)
+		                {
+		                    if (empty($conf->global->CAT_HIGH_QUALITY_IMAGES))		// If CAT_HIGH_QUALITY_IMAGES not defined, we use thumb if defined and then original photo
+		                    {
+		                        if ($obj['photo_vignette'])
+		                        {
+		                            $filename= $obj['photo_vignette'];
+		                        }
+		                        else
+		                        {
+		                            $filename=$obj['photo'];
+		                        }
+		                    }
+		                    else
+		                    {
+		                        $filename=$obj['photo'];
+		                    }
+		                    
+		                    $realpath = $dir.$filename;
+		                    $arephoto = true;
+		                    $this->atleastonephoto = true;
+		                }
+		            }
+		        }
+		        
+		        if ($realpath && $arephoto) $realpatharray[$i]=$realpath;
+		    }
+		}
+		
+		
 
 		if ($conf->commande->dir_output)
 		{
@@ -461,7 +523,11 @@ class pdf_eratosthene extends ModelePDFCommandes
 					$curY = $nexY;
 					$pdf->SetFont('','', $default_font_size - 1);   // Into loop to work with multipage
 					$pdf->SetTextColor(0,0,0);
-
+					
+					// Define size of image if we need it
+					$imglinesize=array();
+					if (! empty($realpatharray[$i])) $imglinesize=pdf_getSizeForImage($realpatharray[$i]);
+					
 					$pdf->setTopMargin($tab_top_newpage);
 					$pdf->setPageOrientation('', 1, $heightforfooter+$heightforfreetext+$heightforinfotot);	// The only function to edit the bottom margin of current page to set it.
 					$pageposbefore=$pdf->getPage();
@@ -470,6 +536,29 @@ class pdf_eratosthene extends ModelePDFCommandes
 					$curX = $this->posxdesc-1;
 
 					$showpricebeforepagebreak=1;
+					$posYAfterImage=0;
+					$posYAfterDescription=0;
+					
+					if($this->getColumnStatus('photo'))
+					{
+					    // We start with Photo of product line
+					    if (isset($imglinesize['width']) && isset($imglinesize['height']) && ($curY + $imglinesize['height']) > ($this->page_hauteur-($heightforfooter+$heightforfreetext+$heightforinfotot)))	// If photo too high, we moved completely on new page
+					    {
+					        $pdf->AddPage('','',true);
+					        if (! empty($tplidx)) $pdf->useTemplate($tplidx);
+					        $pdf->setPage($pageposbefore+1);
+					        
+					        $curY = $tab_top_newpage;
+					        $showpricebeforepagebreak=0;
+					    }
+					    
+					    if (!empty($this->cols['photo']) && isset($imglinesize['width']) && isset($imglinesize['height']))
+					    {
+					        $pdf->Image($realpatharray[$i], $this->getColumnContentXStart('photo'), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
+					        // $pdf->Image does not increase value return by getY, so we save it manually
+					        $posYAfterImage=$curY+$imglinesize['height'];
+					    }
+					}
 					
 					if($this->getColumnStatus('desc'))
 					{
@@ -508,7 +597,11 @@ class pdf_eratosthene extends ModelePDFCommandes
     					$posYAfterDescription=$pdf->GetY();
 					}
 					
-					$nexY = $pdf->GetY();
+					
+					
+					$nexY = max($pdf->GetY(),$posYAfterImage);
+					
+	
 					$pageposafter=$pdf->getPage();
 
 					$pdf->setPage($pageposbefore);
