@@ -24,7 +24,7 @@
  */
 
 /**
- *	\file       htdocs/core/modules/commande/doc/pdf_eratosthene.modules.php
+ *	\file       htdocs/core/modules/commande/doc/pdf_atmeratosthene.modules.php
  *	\ingroup    commande
  *	\brief      Fichier de la classe permettant de generer les commandes au modele Eratosthène
  */
@@ -38,9 +38,9 @@ require_once __DIR__.'/../../../lib/pdf.lib.php'; // include lib not in current 
 
 
 /**
- *	Classe to generate PDF orders with template Eratosthene
+ *	Classe to generate PDF orders with template atmeratosthene
  */
-class pdf_eratosthene extends ModelePDFCommandes
+class pdf_atmeratosthene extends ModelePDFCommandes
 {
     /**
      * @var DoliDb Database handler
@@ -103,8 +103,8 @@ class pdf_eratosthene extends ModelePDFCommandes
 		$langs->loadLangs(array("main", "bills", "products", "pdfevolution@pdfevolution"));
 
 		$this->db = $db;
-		$this->name = "eratosthene";
-		$this->description = $langs->trans('PDFEratostheneDescription');
+		$this->name = "ATM Eratosthène";
+		$this->description = $langs->trans('PDFatmeratostheneDescription');
 		$this->update_main_doc_field = 1;		// Save the name of generated file as the main doc when generating a doc with this template
 
 		// Dimension page

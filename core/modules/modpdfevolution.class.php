@@ -92,12 +92,10 @@ class modpdfevolution extends DolibarrModules
 		//                        );
 		$this->module_parts = array(
 		    'hooks' => array('pdfgeneration'),
-		    'models' => 0 // Set this to 1 if module has its own models directory (core/modules/xxx)
+		    'models' => 1 // Set this to 1 if module has its own models directory (core/modules/xxx)
 		);
 		
-		if(floatval(DOL_VERSION) < 9){
-		  $this->module_parts['models'] = 1; // Set this to 1 if module has its own models directory (core/modules/xxx)
-		}
+		
 
 		// Data directories to create when module is enabled.
 		// Example: this->dirs = array("/pdfevolution/temp");
