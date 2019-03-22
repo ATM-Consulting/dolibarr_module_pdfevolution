@@ -87,6 +87,27 @@ class Actionspdfevolution
         $pdfDoc->insertNewColumnDef('UnitPriceAfterDiscount', $def, 'discount',1);
 
 
+        $def = array(
+            'rank' => 55,
+            'width' => 20, // in mm
+            'status' => false,
+            'title' => array(
+                'label' => $langs->transnoentities('RefFourn')
+            ),
+            'border-left' => true, // add left line separator
+        );
+
+
+        if (!empty($conf->global->PDFEVOLUTION_ADD_COL_REF_FOURN)
+            && !empty($parameters['object'])
+            && $parameters['object']->element == 'order_supplier'
+        ){
+            $def['status'] = true;
+        }
+
+        $pdfDoc->insertNewColumnDef('SupplierRef', $def, 'desc',1);
+
+
 
         $def = array(
             'rank' => 55,
@@ -105,25 +126,6 @@ class Actionspdfevolution
         $pdfDoc->insertNewColumnDef('Ref', $def, 'desc',1);
 
 
-        $def = array(
-            'rank' => 55,
-            'width' => 20, // in mm
-            'status' => false,
-            'title' => array(
-                'label' => $langs->transnoentities('SupplierRef')
-            ),
-            'border-left' => true, // add left line separator
-        );
-
-
-        if (!empty($conf->global->PDFEVOLUTION_ADD_COL_REF_FOURN)
-            && !empty($parameters['object'])
-            && $parameters['object']->element == 'order_supplier'
-        ){
-            $def['status'] = true;
-        }
-
-        $pdfDoc->insertNewColumnDef('SupplierRef', $def, 'desc',1);
 
 
 
