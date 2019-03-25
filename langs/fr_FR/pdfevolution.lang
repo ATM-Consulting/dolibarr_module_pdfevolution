@@ -9,8 +9,8 @@ pdfevolutionAbout = A propos du module pdfevolution
 pdfevolution=pdfevolution
 
 PDFatmspongeDescription=Modèle pdf ATM sponge (éponge). Modèle de facture PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
-PDFatmeratostheneDescription=Modèle pdf ATM équivanlent Eratosthène. Modèle de Commande PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
-DocModelatmcyanDescription=Modèle pdf ATM équivanlent cyan. Modèle de Proposition commerciale PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
+PDFatmeratostheneDescription=Modèle pdf ATM équivalent Eratosthène. Modèle de Commande PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
+DocModelatmcyanDescription=Modèle pdf ATM équivalent cyan. Modèle de Proposition commerciale PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
 
 # SETUP
 ParamLabel=Nom du paramètre
