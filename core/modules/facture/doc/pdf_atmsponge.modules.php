@@ -25,9 +25,9 @@
  */
 
 /**
- *	\file       htdocs/core/modules/facture/doc/pdf_sponge.modules.php
+ *	\file       htdocs/core/modules/facture/doc/pdf_atmsponge.modules.php
  *	\ingroup    facture
- *	\brief      File of class to generate customers invoices from sponge model
+ *	\brief      File of class to generate customers invoices from atmsponge model
  */
 
 require_once DOL_DOCUMENT_ROOT.'/core/modules/facture/modules_facture.php';
@@ -39,9 +39,9 @@ require_once __DIR__.'/../../../lib/pdf.lib.php'; // include lib not in current 
 
 
 /**
- *	Class to manage PDF invoice template sponge
+ *	Class to manage PDF invoice template atmsponge
  */
-class pdf_sponge extends ModelePDFFactures
+class pdf_atmsponge extends ModelePDFFactures
 {
      /**
      * @var DoliDb Database handler
@@ -114,8 +114,8 @@ class pdf_sponge extends ModelePDFFactures
 		$langs->loadLangs(array("main", "bills", "pdfevolution@pdfevolution"));
 
 		$this->db = $db;
-		$this->name = "sponge";
-		$this->description = $langs->trans('PDFSpongeDescription');
+		$this->name = "ATM Sponge";
+		$this->description = $langs->trans('PDFatmspongeDescription');
 		$this->update_main_doc_field = 1;		// Save the name of generated file as the main doc when generating a doc with this template
 
 		// Dimensiont page

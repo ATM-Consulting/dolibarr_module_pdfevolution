@@ -8,9 +8,9 @@ pdfevolutionAbout = A propos du module pdfevolution
 
 pdfevolution=pdfevolution
 
-PDFSpongeDescription=Modèle pdf SPONGE (éponge). Modèle de facture PDF complet (nouveau modèle recommandé)
-PDFEratostheneDescription=Modèle pdf Eratosthène. Modèle de Commande PDF complet (nouveau modèle recommandé)
-DocModelCyanDescription=Modèle pdf Cyan. Modèle de Proposition commerciale PDF complet (nouveau modèle recommandé)
+PDFatmspongeDescription=Modèle pdf ATM sponge (éponge). Modèle de facture PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
+PDFatmeratostheneDescription=Modèle pdf ATM équivalent Eratosthène. Modèle de Commande PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
+DocModelatmcyanDescription=Modèle pdf ATM équivalent cyan. Modèle de Proposition commerciale PDF complet (nouveau modèle recommandé pour dolibarr < 10 )
 
 # SETUP
 ParamLabel=Nom du paramètre
@@ -33,14 +33,18 @@ PDFEVOLUTION_DISABLE_COL_HEAD_TITLE=Ne pas afficher la ligne de titre des colonn
 
 EnableCol=Afficher la colonne
 DisplaySeparator=Afficher la ligne de separation
-PHOTO=Photo
-SUBPRICE=Prix unitaire
-DISCOUNT=Remise
-UNIT_PRICE_AFTER_DISCOUNT=Prix unitaire avec remise
-UNIT=Unité
-PROGRESS=Progression
-TOTALEXCLTAX=Total HT
-QTY=Quantité
+PDFEVOLUTION_PHOTO=Photo
+PDFEVOLUTION_SUBPRICE=Prix unitaire
+PDFEVOLUTION_DISCOUNT=Remise
+PDFEVOLUTION_UNIT_PRICE_AFTER_DISCOUNT=Prix unitaire avec remise
+PDFEVOLUTION_UNIT=Unité
+PDFEVOLUTION_PROGRESS=Progression
+PDFEVOLUTION_TOTALEXCLTAX=Total HT
+PDFEVOLUTION_QTY=Quantité
+PDFEVOLUTION_VAT=TVA
+PDFEVOLUTION_REF=REF
+PDFEVOLUTION_REF_FOURN=Référence fournisseur <br/><small>(sur commande fournisseur)</small>
+RefFourn=Réf. Fourn
 
 # MENU
 TopMenupdfevolution=pdfevolution

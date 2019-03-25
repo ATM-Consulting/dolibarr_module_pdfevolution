@@ -62,78 +62,128 @@ class Actionspdfevolution
 	public function defineColumnField($parameters, &$pdfDoc, &$action, $hookmanager)
     {
         global $conf, $user, $langs;
-        
+
+
         // Translations
         $langs->loadLangs(array("pdfevolution@pdfevolution"));
         
         $contexts = explode(':',$parameters['context']);
-        if ($pdfDoc->name == 'sponge' ||  $pdfDoc->name == 'sponge_btp' || $pdfDoc->name == 'eratosthene' || $pdfDoc->name == 'cyan' ){
-            
-            $def = array(
-                'rank' => 55,
-                'width' => 20, // in mm
-                'status' => false,
-                'title' => array(
-                    'label' => $langs->trans('UnitPriceAfterDiscount')
-                ),
-                'border-left' => true, // add left line separator
-            );
-            
-            if ($pdfDoc->atleastonediscount && !empty($conf->global->PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT)){
-                $def['status'] = true;
-            }
-            
-            $pdfDoc->insertNewColumnDef('UnitPriceAfterDiscount', $def, 'discount',1);
-            
-           
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX)){
-                $pdfDoc->cols['totalexcltax']['status'] = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_DISCOUNT)){
-                $pdfDoc->cols['discount']['status']     = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_UNIT)){
-                $pdfDoc->cols['unit']['status']         = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_PROGRESS)){
-                $pdfDoc->cols['progress']['status']     = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_QTY)){
-                $pdfDoc->cols['qty']['status']          = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_SUBPRICE)){
-                $pdfDoc->cols['subprice']['status']     = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_VAT)){
-                $pdfDoc->cols['vat']['status']          = false;
-            }
-            
-            if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_PHOTO)){
-                $pdfDoc->cols['photo']['status']        = false;
-            }
-            
-            
-            $Tcol = array(
-                'TOTALEXCLTAX', 'DISCOUNT', 'UNIT_PRICE_AFTER_DISCOUNT', 'UNIT', 'PROGRESS', 'QTY', 'SUBPRICE', 'VAT', 'PHOTO'
-            ); 
-            
-            foreach ($Tcol as $col){
-                $constUsed = 'PDFEVOLUTION_DISABLE_LEFT_SEP_'.$col;
-                if(!empty($conf->global->{$constUsed})){
-                    $pdfDoc->cols[strtolower($col)]['border-left']        = false;
-                }
-            }
-            
-            
-            
+
+
+        $def = array(
+            'rank' => 55,
+            'width' => 20, // in mm
+            'status' => false,
+            'title' => array(
+                'label' => $langs->transnoentities('UnitPriceAfterDiscount')
+            ),
+            'border-left' => true, // add left line separator
+        );
+
+        if ($pdfDoc->atleastonediscount && !empty($conf->global->PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT)){
+            $def['status'] = true;
         }
+
+        $pdfDoc->insertNewColumnDef('UnitPriceAfterDiscount', $def, 'discount',1);
+
+
+        $def = array(
+            'rank' => 55,
+            'width' => 20, // in mm
+            'status' => false,
+            'title' => array(
+                'label' => $langs->transnoentities('RefFourn')
+            ),
+            'border-left' => true, // add left line separator
+        );
+
+
+        if (!empty($conf->global->PDFEVOLUTION_ADD_COL_REF_FOURN)
+            && !empty($parameters['object'])
+            && $parameters['object']->element == 'order_supplier'
+        ){
+            $def['status'] = true;
+        }
+
+        $pdfDoc->insertNewColumnDef('SupplierRef', $def, 'desc',1);
+
+
+
+        $def = array(
+            'rank' => 55,
+            'width' => 25, // in mm
+            'status' => false,
+            'title' => array(
+                'label' => $langs->transnoentities('Ref')
+            ),
+            'border-left' => true, // add left line separator
+        );
+
+        if (!empty($conf->global->PDFEVOLUTION_ADD_COL_REF)){
+            $def['status'] = true;
+        }
+
+        $pdfDoc->insertNewColumnDef('Ref', $def, 'desc',1);
+
+
+
+
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX)){
+            $pdfDoc->cols['totalexcltax']['status'] = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_DISCOUNT)){
+            $pdfDoc->cols['discount']['status']     = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_UNIT)){
+            $pdfDoc->cols['unit']['status']         = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_PROGRESS)){
+            $pdfDoc->cols['progress']['status']     = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_QTY)){
+            $pdfDoc->cols['qty']['status']          = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_SUBPRICE)){
+            $pdfDoc->cols['subprice']['status']     = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_VAT)){
+            $pdfDoc->cols['vat']['status']          = false;
+        }
+
+        if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_PHOTO)){
+            $pdfDoc->cols['photo']['status']        = false;
+        }
+
+
+        $Tcol = array(
+            'TOTALEXCLTAX'
+            ,'DISCOUNT'
+            ,'UNIT_PRICE_AFTER_DISCOUNT'
+            ,'UNIT'
+            ,'PROGRESS'
+            ,'QTY'
+            ,'SUBPRICE'
+            ,'VAT'
+            ,'PHOTO'
+            ,'REF'
+            ,'SUPPLIER_REF'
+        );
+
+        foreach ($Tcol as $col){
+            $constUsed = 'PDFEVOLUTION_DISABLE_LEFT_SEP_'.$col;
+            if(!empty($conf->global->{$constUsed})){
+                $pdfDoc->cols[strtolower($col)]['border-left']        = false;
+            }
+        }
+            
+
         
         
         
@@ -155,12 +205,14 @@ class Actionspdfevolution
         $pdf =& $parameters['pdf'];
         $i = $parameters['i'];
         $outputlangs = $parameters['outputlangs'];
-        
+
+        $returnVal = 0;
+
+        $object = $parameters['object'];
+
         if ($pdfDoc->getColumnStatus('UnitPriceAfterDiscount'))
         {
-            $object = $parameters['object'];
-            
-            
+
             $sign=1;
             if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
             
@@ -181,7 +233,27 @@ class Actionspdfevolution
                 $pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'UnitPriceAfterDiscount', $celText );
                 $parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
             }
-            return 1;
+
+            $returnVal =  1;
         }
+
+        if ($pdfDoc->getColumnStatus('Ref'))
+        {
+            $pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'Ref',  $object->lines[$i]->ref );
+            $parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
+
+            $returnVal =  1;
+        }
+
+        if ($pdfDoc->getColumnStatus('SupplierRef'))
+        {
+            $pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'SupplierRef',  $object->lines[$i]->ref_fourn );
+            $parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
+
+            $returnVal =  1;
+        }
+
+
+        return $returnVal;
     }
 }

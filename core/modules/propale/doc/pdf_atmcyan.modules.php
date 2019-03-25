@@ -24,9 +24,9 @@
  */
 
 /**
- *	\file       htdocs/core/modules/propale/doc/pdf_cyan.modules.php
+ *	\file       htdocs/core/modules/propale/doc/pdf_atmcyan.modules.php
  *	\ingroup    propale
- *	\brief      Fichier de la classe permettant de generer les propales au modele Cyan
+ *	\brief      Fichier de la classe permettant de generer les propales au modele atmcyan
  */
 require_once DOL_DOCUMENT_ROOT.'/core/modules/propale/modules_propale.php';
 require_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
@@ -37,9 +37,9 @@ require_once __DIR__.'/../../../lib/pdf.lib.php'; // include lib not in current 
 
 
 /**
- *	Class to generate PDF proposal Cyan
+ *	Class to generate PDF proposal atmcyan
  */
-class pdf_cyan extends ModelePDFPropales
+class pdf_atmcyan extends ModelePDFPropales
 {
 	var $db;
 	var $name;
@@ -74,8 +74,8 @@ class pdf_cyan extends ModelePDFPropales
 		$langs->loadLangs(array("main", "bills", "pdfevolution@pdfevolution"));
 
 		$this->db = $db;
-		$this->name = "cyan";
-		$this->description = $langs->trans('DocModelCyanDescription');
+		$this->name = "ATM Cyan";
+		$this->description = $langs->trans('DocModelatmcyanDescription');
 		$this->update_main_doc_field = 1;		// Save the name of generated file as the main doc when generating a doc with this template
 
 		// Dimension page

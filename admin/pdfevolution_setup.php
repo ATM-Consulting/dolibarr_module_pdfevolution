@@ -113,7 +113,10 @@ print ('<br/><br/>');
 
 $Tcol = array();
 
-     
+$Tcol[] = 'REF';
+
+// commande fourn
+$Tcol[] = 'REF_FOURN';
 
 if (! empty($conf->global->MAIN_GENERATE_INVOICES_WITH_PICTURE) && !empty($this->atleastonephoto))
 {
@@ -137,6 +140,7 @@ $Tcol[] = 'PROGRESS';
 $Tcol[] = 'QTY';
 $Tcol[] = 'TOTALEXCLTAX';
 
+
 print '<table class="noborder" width="100%">';
 
 
@@ -144,7 +148,7 @@ print '<thead>';
 print '<tr>';
 print '<th class="left"  >'.$langs->trans('Parameters').'</th>';
 foreach ($Tcol as $col){
-    print '<th class="center"  >'.$langs->trans($col).'</th>';
+    print '<th class="center"  >'.$langs->trans('PDFEVOLUTION_'.$col).'</th>';
 }
 print '</tr>';
 print '</thead>';
@@ -160,6 +164,11 @@ foreach ($Tcol as $col){
     if('UNIT_PRICE_AFTER_DISCOUNT' === $col){
         $revertonoff = 0;
         $constUsed = 'PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT';
+    }
+
+    if('REF_FOURN' === $col || 'REF' === $col){
+        $revertonoff = 0;
+        $constUsed = 'PDFEVOLUTION_ADD_COL_'.$col;
     }
     
     print '<td class="center" >'.ajax_constantonoff($constUsed, array(), null, $revertonoff).'</td>';
