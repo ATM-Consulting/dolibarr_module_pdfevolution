@@ -1599,7 +1599,7 @@ class pdf_atmsponge extends ModelePDFFactures
 							}
 						}
 					}
-				}
+//				}
 
 				// Revenue stamp
 				if (price2num($object->revenuestamp) != 0)
