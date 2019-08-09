@@ -71,15 +71,15 @@ class Actionspdfevolution
 
 		$def = array(
 			'rank' => 100,
-			'width' => 30, // in mm
-			'status' => true, // todo : change to false
+			'width' => 25, // in mm
+			'status' => false,
 			'title' => array(
-				'label' => $langs->transnoentities('totalincltax')
+				'label' => $langs->transnoentities('TotalTTCShort')
 			),
 			'border-left' => true, // add left line separator
 		);
 
-		if ($pdfDoc->atleastonediscount && !empty($conf->global->PDFEVOLUTION_ADD_TOTAL_INCLUDING_TAX)){
+		if (! empty($conf->global->PDFEVOLUTION_ADD_TOTAL_INCLUDING_TAX)){
 			$def['status'] = true;
 		}
 
@@ -260,9 +260,9 @@ class Actionspdfevolution
 			$sign=1;
 			if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
 
-			$price = $sign * 100;  // TODO : calc or add real PRICE
+			$price = $sign * $object->lines[$i]->total_ttc;
 
-			$celText = $price;
+			$celText = price($price);
 			if ($object->lines[$i]->special_code == 3){
 				$celText = '';
 			}
