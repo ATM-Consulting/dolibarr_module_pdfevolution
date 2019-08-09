@@ -72,7 +72,7 @@ class Actionspdfevolution
 		$def = array(
 			'rank' => 100,
 			'width' => 30, // in mm
-			'status' => true,
+			'status' => true, // todo : change to false
 			'title' => array(
 				'label' => $langs->transnoentities('totalincltax')
 			),
@@ -260,7 +260,7 @@ class Actionspdfevolution
 			$sign=1;
 			if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
 
-			$price = $sign * 100;
+			$price = $sign * 100;  // TODO : calc or add real PRICE
 
 			$celText = $price;
 			if ($object->lines[$i]->special_code == 3){
