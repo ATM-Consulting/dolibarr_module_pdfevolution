@@ -139,6 +139,7 @@ if($conf->global->PRODUCT_USE_UNITS){
 $Tcol[] = 'PROGRESS';
 $Tcol[] = 'QTY';
 $Tcol[] = 'TOTALEXCLTAX';
+$Tcol[] = 'TOTALINCLTAX';
 
 
 print '<table class="noborder" width="100%">';

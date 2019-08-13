@@ -69,6 +69,22 @@ class Actionspdfevolution
         
         $contexts = explode(':',$parameters['context']);
 
+		$def = array(
+			'rank' => 100,
+			'width' => 25, // in mm
+			'status' => false,
+			'title' => array(
+				'label' => $langs->transnoentities('TotalTTCShort')
+			),
+			'border-left' => true, // add left line separator
+		);
+
+		if (! empty($conf->global->PDFEVOLUTION_ADD_TOTAL_INCLUDING_TAX)){
+			$def['status'] = true;
+		}
+
+		$pdfDoc->insertNewColumnDef('totalincltax', $def, 'totalexcltax',1);
+
 
         $def = array(
             'rank' => 55,
@@ -236,6 +252,29 @@ class Actionspdfevolution
 
             $returnVal =  1;
         }
+
+
+        if ($pdfDoc->getColumnStatus('totalincltax'))
+		{
+
+			$sign=1;
+			if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
+
+			$price = $sign * $object->lines[$i]->total_ttc;
+
+			$celText = price($price);
+			if ($object->lines[$i]->special_code == 3){
+				$celText = '';
+			}
+
+
+			if(!empty($celText)){
+				$pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'totalincltax', $celText );
+				$parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
+			}
+
+			$returnVal =  1;
+		}
 
         if ($pdfDoc->getColumnStatus('Ref'))
         {
