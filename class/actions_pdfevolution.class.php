@@ -226,6 +226,14 @@ class Actionspdfevolution
 
         $object = $parameters['object'];
 
+		// is subtotal ?
+		if(is_callable('TSubtotal::isModSubtotalLine')){
+			if(TSubtotal::isModSubtotalLine($object->lines[$i])){
+				return 0;
+			}
+		}
+
+
         if ($pdfDoc->getColumnStatus('UnitPriceAfterDiscount'))
         {
 
@@ -256,6 +264,8 @@ class Actionspdfevolution
 
         if ($pdfDoc->getColumnStatus('totalincltax'))
 		{
+
+
 
 			$sign=1;
 			if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
