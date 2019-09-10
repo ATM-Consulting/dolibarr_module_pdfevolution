@@ -66,7 +66,7 @@ class Actionspdfevolution
 
         // Translations
         $langs->loadLangs(array("pdfevolution@pdfevolution"));
-        
+
         $contexts = explode(':',$parameters['context']);
 
 		$def = array(
@@ -101,6 +101,7 @@ class Actionspdfevolution
         }
 
         $pdfDoc->insertNewColumnDef('UnitPriceAfterDiscount', $def, 'discount',1);
+
 
 
         $def = array(
@@ -142,7 +143,23 @@ class Actionspdfevolution
         $pdfDoc->insertNewColumnDef('Ref', $def, 'desc',1);
 
 
-
+		$def = array(
+			'rank' => 55,
+			'width' => 30, // in mm
+			'status' => false,
+			'title' => array(
+				'label' => $langs->transnoentities('RefExpedition')
+			),
+			'border-left' => true, // add left line separator
+		);
+		if (!empty($parameters['object'])
+			&& $parameters['object']->element == 'facture'
+			&& !empty($parameters['object']->linkedObjects['shipping'])
+			&& !empty($conf->expedition->enabled)
+			&& !empty($conf->global->PDFEVOLUTION_ADD_COL_REF_EXPEDITION)){
+			$def['status'] = true;
+		}
+		$pdfDoc->insertNewColumnDef('RefExpedition', $def, 'qty',1);
 
 
         if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX)){
@@ -190,6 +207,7 @@ class Actionspdfevolution
             ,'PHOTO'
             ,'REF'
             ,'SUPPLIER_REF'
+			,'REF_EXPEDITION'
         );
 
         foreach ($Tcol as $col){
@@ -198,14 +216,13 @@ class Actionspdfevolution
                 $pdfDoc->cols[strtolower($col)]['border-left']        = false;
             }
         }
-            
 
-        
-        
-        
-        
+
+
+
+
+
     }
-    
     /*
      * Overloading the printPDFline function
      *
@@ -239,10 +256,10 @@ class Actionspdfevolution
 
             $sign=1;
             if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
-            
+
             $subprice = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1 ? $object->lines[$i]->multicurrency_subprice : $object->lines[$i]->subprice);
             $subprice = $sign * $subprice;
-            
+
             $celText = '';
             if ($object->lines[$i]->special_code == 3){
                 $celText = '';
@@ -251,8 +268,8 @@ class Actionspdfevolution
                 $subpriceWD = $subprice - ($subprice * $object->lines[$i]->remise_percent / 100) ;
                 $celText = price($subpriceWD, 0, $outputlangs);
             }
-            
-            
+
+
             if(!empty($celText)){
                 $pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'UnitPriceAfterDiscount', $celText );
                 $parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
@@ -301,6 +318,38 @@ class Actionspdfevolution
 
             $returnVal =  1;
         }
+
+        // Shipping
+		if ($pdfDoc->getColumnStatus('RefExpedition'))
+		{
+
+			$object->fetchObjectLinked();
+			$object->lines[$i]->fetchObjectLinked();
+
+			$shipping_content = '';
+
+			if(!empty($object->linkedObjects['shipping'])){
+				if(count($object->linkedObjects['shipping']) == 1){
+					$shipping =  array_shift($object->linkedObjects['shipping']);
+					$shipping_content = $shipping->ref;
+					if(!empty($shipping->date_delivery))$shipping_content .=' '.date('d/m/Y', $shipping->date_delivery);
+				}else {
+					$object->lines[$i]->fetchObjectLinked();
+					if (!empty($object->lines[$i]->linkedObjects['shipping']))
+					{
+						$shipping =  array_shift($object->lines[$i]->linkedObjects['shipping']);
+						$shipping_content = $shipping->ref;
+						if(!empty($shipping->date_delivery))$shipping_content .=' '.date('d/m/Y', $shipping->date_delivery);
+					}
+				}
+			}
+
+			$pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'RefExpedition', $shipping_content);
+			$parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
+
+			$returnVal =  1;
+		}
+
 
 
         return $returnVal;
