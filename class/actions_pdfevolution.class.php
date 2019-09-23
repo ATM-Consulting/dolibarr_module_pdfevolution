@@ -161,6 +161,23 @@ class Actionspdfevolution
 		}
 		$pdfDoc->insertNewColumnDef('RefExpedition', $def, 'qty',1);
 
+//		$def = array(
+//			'rank' => 55,
+//			'width' => 30, // in mm
+//			'status' => false,
+//			'title' => array(
+//				'label' => $langs->transnoentities('Asset')
+//			),
+//			'border-left' => true, // add left line separator
+//		);
+//		if (!empty($parameters['object'])
+//			&& $parameters['object']->element == 'shipping'
+//			&& !empty($conf->expedition->enabled)
+//			&& !empty($conf->assetatm->enabled)){
+//			$def['status'] = true;
+//		}
+//		$pdfDoc->insertNewColumnDef('AssetExpedition', $def, 'desc',1);
+
 
         if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX)){
             $pdfDoc->cols['totalexcltax']['status'] = false;
@@ -345,6 +362,17 @@ class Actionspdfevolution
 			}
 
 			$pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'RefExpedition', $shipping_content);
+			$parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
+
+			$returnVal =  1;
+		}
+
+		// Shipping Asset ATM
+		if ($pdfDoc->getColumnStatus('AssetExpedition'))
+		{
+			$asset_content  ='';
+
+			$pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'AssetExpedition', $asset_content);
 			$parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
 
 			$returnVal =  1;
