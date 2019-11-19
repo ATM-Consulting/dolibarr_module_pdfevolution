@@ -68,9 +68,9 @@ class pdf_saumon extends ModelePdfExpedition
 		$this->emetteur=$mysoc;
 		if (! $this->emetteur->country_code) $this->emetteur->country_code=substr($langs->defaultlang,-2);    // By default if not defined
 
-		
+
 		$this->tabTitleHeight = 5; // default height
-		
+
 	}
 
 	/**
@@ -317,17 +317,17 @@ class pdf_saumon extends ModelePdfExpedition
 				{
 					$height_note=0;
 				}
-				
-				
+
+
 				// Use new auto collum system
 				$this->prepareArrayColumnField($object,$outputlangs,$hidedetails,$hidedesc,$hideref);
-				
+
 				// Simulation de tableau pour connaitre la hauteur de la ligne de titre
 				$pdf->startTransaction();
 				$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
 				$pdf->rollbackTransaction(true);
-				
-				
+
+
 				$iniY = $tab_top + $this->tabTitleHeight + 2;
 				$curY = $tab_top + $this->tabTitleHeight + 2;
 				$nexY = $tab_top + $this->tabTitleHeight + 2;
@@ -360,12 +360,12 @@ class pdf_saumon extends ModelePdfExpedition
 					        if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 					        //if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
 					        $pdf->setPage($pageposbefore+1);
-					        
+
 					        $curY = $tab_top_newpage;
 					        $showpricebeforepagebreak=0;
 					    }
-					    
-					    
+
+
 					    if (!empty($this->cols['photo']) && isset($imglinesize['width']) && isset($imglinesize['height']))
 					    {
 					        $pdf->Image($realpatharray[$i], $this->getColumnContentXStart('photo'), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
@@ -387,7 +387,7 @@ class pdf_saumon extends ModelePdfExpedition
 					        //print $pageposafter.'-'.$pageposbefore;exit;
 					        $pdf->setPageOrientation('', 1, $heightforfooter);	// The only function to edit the bottom margin of current page to set it.
 					        pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->getColumnContentWidth('desc'),3,$this->getColumnContentXStart('desc'),$curY,$hideref,$hidedesc);
-					        
+
 					        $pageposafter=$pdf->getPage();
 					        $posyafter=$pdf->GetY();
 					        //var_dump($posyafter); var_dump(($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot))); exit;
@@ -433,9 +433,9 @@ class pdf_saumon extends ModelePdfExpedition
 
 					$pdf->SetFont('','', $default_font_size - 1);   // On repositionne la police par defaut
 
-					
+
 					// weight
-					
+
 					$weighttxt='';
 					if ($object->lines[$i]->fk_product_type == 0 && $object->lines[$i]->weight)
 					{
@@ -446,32 +446,43 @@ class pdf_saumon extends ModelePdfExpedition
 					{
 					    $voltxt=round($object->lines[$i]->volume * $object->lines[$i]->qty_shipped, 5).' '.measuring_units_string($object->lines[$i]->volume_units?$object->lines[$i]->volume_units:0,"volume");
 					}
-					
-					
+
+
 					if ($this->getColumnStatus('weight'))
 					{
 					    $this->printStdColumnContent($pdf, $curY, 'weight', $weighttxt.(($weighttxt && $voltxt)?'<br>':'').$voltxt, array('html'=>1));
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
 					if ($this->getColumnStatus('qty_asked'))
 					{
 					    $this->printStdColumnContent($pdf, $curY, 'qty_asked', $object->lines[$i]->qty_asked);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
 					if ($this->getColumnStatus('qty_shipped'))
 					{
 					    $this->printStdColumnContent($pdf, $curY, 'qty_shipped', $object->lines[$i]->qty_shipped);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
 					if ($this->getColumnStatus('subprice'))
 					{
 					    $this->printStdColumnContent($pdf, $curY, 'subprice', price($object->lines[$i]->subprice, 0, $outputlangs));
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
+
+					$parameters=array(
+						'object' => $object,
+						'i' => $i,
+						'pdf' =>& $pdf,
+						'curY' =>& $curY,
+						'nexY' =>& $nexY,
+						'outputlangs' => $outputlangs,
+						'hidedetails' => $hidedetails
+					);
+					$reshook=$hookmanager->executeHooks('printPDFline',$parameters,$this);    // Note that $object may have been modified by hook
 
 
 					$nexY+=3;
@@ -628,14 +639,14 @@ class pdf_saumon extends ModelePdfExpedition
 		if ($object->trueWeight) $totalWeighttoshow=showDimensionInBestUnit($object->trueWeight, $object->weight_units, "weight", $outputlangs);
 		if ($object->trueVolume) $totalVolumetoshow=showDimensionInBestUnit($object->trueVolume, $object->volume_units, "volume", $outputlangs);
 
-		
-		
+
+
 
     	if ($this->getColumnStatus('desc'))
     	{
     	    $this->printStdColumnContent($pdf, $tab2_top, 'desc', $outputlangs->transnoentities("Total"));
     	}
-    	
+
 
 		if ($this->getColumnStatus('weight'))
 		{
@@ -644,36 +655,36 @@ class pdf_saumon extends ModelePdfExpedition
 		        $this->printStdColumnContent($pdf, $tab2_top, 'weight', $totalWeighttoshow);
 		        $index++;
 		    }
-		    
+
 		    if ($totalVolumetoshow)
 		    {
 		        $y = $tab2_top + ($tab2_hl * $index);
 		        $this->printStdColumnContent($pdf, $y, 'weight', $totalVolumetoshow);
 		    }
-		    
+
 		}
-		
-		
-		
-		
+
+
+
+
 		if ($this->getColumnStatus('qty_asked') && $totalOrdered)
 		{
 		    $this->printStdColumnContent($pdf, $tab2_top, 'qty_asked', $totalOrdered);
 		}
-		
+
 		if ($this->getColumnStatus('qty_shipped') && $totalToShip)
 		{
 		    $this->printStdColumnContent($pdf, $tab2_top, 'qty_shipped', $totalToShip);
 		}
-		
-		
-		
+
+
+
 		if ($this->getColumnStatus('subprice'))
 		{
 		    $this->printStdColumnContent($pdf, $tab2_top, 'subprice', price($object->total_ht, 0, $outputlangs));
 		}
-		
-		
+
+
 		$pdf->SetTextColor(0,0,0);
 
 		return ($tab2_top + ($tab2_hl * $index));
@@ -718,13 +729,13 @@ class pdf_saumon extends ModelePdfExpedition
 		// Output Rect
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
-		
+
 		$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
-		
+
 		if (empty($hidetop)){
 		    $pdf->line($this->marge_gauche, $tab_top+$this->tabTitleHeight, $this->page_largeur-$this->marge_droite, $tab_top+$this->tabTitleHeight);	// line prend une position y en 2eme param et 4eme param
 		}
-		
+
 
 	}
 
@@ -1003,21 +1014,21 @@ class pdf_saumon extends ModelePdfExpedition
 	 *      @return	null
 	 */
 	function defineColumnField($object,$outputlangs,$hidedetails=0,$hidedesc=0,$hideref=0){
-	    
+
 	    global $conf, $hookmanager;
-	    
+
 	    // Default field style for content
 	    $this->defaultContentsFieldsStyle = array(
 	        'align' => 'R', // R,C,L
 	        'padding' => array(0.5,0.5,0.5,0.5), // Like css 0 => top , 1 => right, 2 => bottom, 3 => left
 	    );
-	    
+
 	    // Default field style for content
 	    $this->defaultTitlesFieldsStyle = array(
 	        'align' => 'C', // R,C,L
 	        'padding' => array(0.5,0,0.5,0), // Like css 0 => top , 1 => right, 2 => bottom, 3 => left
 	    );
-	    
+
 	    /*
 	     * For exemple
 	     $this->cols['theColKey'] = array(
@@ -1035,7 +1046,7 @@ class pdf_saumon extends ModelePdfExpedition
 	     ),
 	     );
 	     */
-	    
+
 	    $rank=0; // do not use negative rank
 	    $this->cols['desc'] = array(
 	        'rank' => $rank,
@@ -1052,7 +1063,7 @@ class pdf_saumon extends ModelePdfExpedition
 	            'align' => 'L',
 	        ),
 	    );
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['photo'] = array(
 	        'rank' => $rank,
@@ -1067,12 +1078,12 @@ class pdf_saumon extends ModelePdfExpedition
 	        ),
 	        'border-left' => false, // remove left line separator
 	    );
-	    
+
 	    if (! empty($conf->global->MAIN_GENERATE_PROPOSALS_WITH_PICTURE) && !empty($this->atleastonephoto))
 	    {
 	        $this->cols['photo']['status'] = true;
 	    }
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['weight'] = array(
 	        'rank' => $rank,
@@ -1084,7 +1095,7 @@ class pdf_saumon extends ModelePdfExpedition
 	        'border-left' => true, // add left line separator
 	    );
 
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['subprice'] = array(
 	        'rank' => $rank,
@@ -1094,8 +1105,8 @@ class pdf_saumon extends ModelePdfExpedition
 	            'textkey' => 'PriceUHT'
 	        ),
 	        'border-left' => true, // add left line separator
-	    );	    
-	    
+	    );
+
 	    $rank = $rank + 10;
 	    $this->cols['totalexcltax'] = array(
 	        'rank' => $rank,
@@ -1106,7 +1117,7 @@ class pdf_saumon extends ModelePdfExpedition
 	        ),
 	        'border-left' => true, // add left line separator
 	    );
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['qty_asked'] = array(
 	        'rank' => $rank,
@@ -1120,7 +1131,7 @@ class pdf_saumon extends ModelePdfExpedition
 	            'align' => 'C',
 	        ),
 	    );
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['qty_shipped'] = array(
 	        'rank' => $rank,
@@ -1134,8 +1145,8 @@ class pdf_saumon extends ModelePdfExpedition
 	            'align' => 'C',
 	        ),
 	    );
-	    
-	    
+
+
 	    $parameters=array(
 	        'object' => $object,
 	        'outputlangs' => $outputlangs,
@@ -1143,7 +1154,7 @@ class pdf_saumon extends ModelePdfExpedition
 	        'hidedesc' => $hidedesc,
 	        'hideref' => $hideref
 	    );
-	    
+
 	    $reshook=$hookmanager->executeHooks('defineColumnField',$parameters,$this);    // Note that $object may have been modified by hook
 	    if ($reshook < 0)
 	    {
@@ -1157,19 +1168,19 @@ class pdf_saumon extends ModelePdfExpedition
 	    {
 	        $this->cols = $hookmanager->resArray;
 	    }
-	    
+
 	}
-	
-	
-	
-	
+
+
+
+
 	/*
 	 *
 	 * DEBUT PARTIE NORMALEMENT DANS LA CLASSE CommonDocGenerator
 	 *
 	 *
 	 */
-	
+
 	/**
 	 *   	uasort callback function to Sort colums fields
 	 *
@@ -1178,16 +1189,16 @@ class pdf_saumon extends ModelePdfExpedition
 	 *      @return	int								Return compare result
 	 */
 	function columnSort($a, $b) {
-	    
+
 	    if(empty($a['rank'])){ $a['rank'] = 0; }
 	    if(empty($b['rank'])){ $b['rank'] = 0; }
 	    if ($a['rank'] == $b['rank']) {
 	        return 0;
 	    }
 	    return ($a['rank'] > $b['rank']) ? -1 : 1;
-	    
+
 	}
-	
+
 	/**
 	 *   	Prepare Array Column Field
 	 *
@@ -1199,33 +1210,33 @@ class pdf_saumon extends ModelePdfExpedition
 	 *      @return	null
 	 */
 	function prepareArrayColumnField($object,$outputlangs,$hidedetails=0,$hidedesc=0,$hideref=0){
-	    
+
 	    global $conf;
-	    
+
 	    $this->defineColumnField($object,$outputlangs,$hidedetails,$hidedesc,$hideref);
-	    
-	    
+
+
 	    // Sorting
 	    uasort ( $this->cols, array( $this, 'columnSort' ) );
-	    
+
 	    // Positionning
 	    $curX = $this->page_largeur-$this->marge_droite; // start from right
-	    
+
 	    // Array witdh
 	    $arrayWidth = $this->page_largeur-$this->marge_droite-$this->marge_gauche;
-	    
+
 	    // Count flexible column
 	    $totalDefinedColWidth = 0;
 	    $countFlexCol = 0;
 	    foreach ($this->cols as $colKey =>& $colDef)
 	    {
 	        if(!$this->getColumnStatus($colKey)) continue; // continue if desable
-	        
+
 	        if(!empty($colDef['scale'])){
 	            // In case of column widht is defined by percentage
 	            $colDef['width'] = abs($arrayWidth * $colDef['scale'] / 100 );
 	        }
-	        
+
 	        if(empty($colDef['width'])){
 	            $countFlexCol++;
 	        }
@@ -1233,7 +1244,7 @@ class pdf_saumon extends ModelePdfExpedition
 	            $totalDefinedColWidth += $colDef['width'];
 	        }
 	    }
-	    
+
 	    foreach ($this->cols as $colKey =>& $colDef)
 	    {
 	        // setting empty conf with default
@@ -1243,7 +1254,7 @@ class pdf_saumon extends ModelePdfExpedition
 	        else{
 	            $colDef['title'] = $this->defaultTitlesFieldsStyle;
 	        }
-	        
+
 	        // setting empty conf with default
 	        if(!empty($colDef['content'])){
 	            $colDef['content'] = array_replace($this->defaultContentsFieldsStyle, $colDef['content']);
@@ -1251,14 +1262,14 @@ class pdf_saumon extends ModelePdfExpedition
 	        else{
 	            $colDef['content'] = $this->defaultContentsFieldsStyle;
 	        }
-	        
+
 	        if($this->getColumnStatus($colKey))
 	        {
 	            // In case of flexible column
 	            if(empty($colDef['width'])){
 	                $colDef['width'] = abs(($arrayWidth - $totalDefinedColWidth)) / $countFlexCol;
 	            }
-	            
+
 	            // Set positions
 	            $lastX = $curX;
 	            $curX = $lastX - $colDef['width'];
@@ -1267,7 +1278,7 @@ class pdf_saumon extends ModelePdfExpedition
 	        }
 	    }
 	}
-	
+
 	/**
 	 *   	get column content width from column key
 	 *
@@ -1279,8 +1290,8 @@ class pdf_saumon extends ModelePdfExpedition
 	    $colDef = $this->cols[$colKey];
 	    return  $colDef['width'] - $colDef['content']['padding'][3] - $colDef['content']['padding'][1];
 	}
-	
-	
+
+
 	/**
 	 *   	get column content X (abscissa) left position from column key
 	 *
@@ -1292,7 +1303,7 @@ class pdf_saumon extends ModelePdfExpedition
 	    $colDef = $this->cols[$colKey];
 	    return  $colDef['xStartPos'] + $colDef['content']['padding'][3];
 	}
-	
+
 	/**
 	 *   	get column position rank from column key
 	 *
@@ -1304,7 +1315,7 @@ class pdf_saumon extends ModelePdfExpedition
 	    if(!isset($this->cols[$colKey]['rank'])) return -1;
 	    return  $this->cols[$colKey]['rank'];
 	}
-	
+
 	/**
 	 *   	get column position rank from column key
 	 *
@@ -1318,21 +1329,21 @@ class pdf_saumon extends ModelePdfExpedition
 	{
 	    // prepare wanted rank
 	    $rank = -1;
-	    
+
 	    // try to get rank from target column
 	    if(!empty($targetCol)){
 	        $rank = $this->getColumnRank($targetCol);
 	        if($rank>=0 && $insertAfterTarget){ $rank++; }
 	    }
-	    
+
 	    // get rank from new column definition
 	    if($rank<0 && !empty($defArray['rank'])){
 	        $rank = $defArray['rank'];
 	    }
-	    
+
 	    // error: no rank
 	    if($rank<0){ return -1; }
-	    
+
 	    foreach ($this->cols as $colKey =>& $colDef)
 	    {
 	        if( $rank <= $colDef['rank'])
@@ -1340,14 +1351,14 @@ class pdf_saumon extends ModelePdfExpedition
 	            $colDef['rank'] = $colDef['rank'] + 1;
 	        }
 	    }
-	    
+
 	    $defArray['rank'] = $rank;
 	    $this->cols[$newColKey] = $defArray; // array_replace is used to preserve keys
-	    
+
 	    return $rank;
 	}
-	
-	
+
+
 	/**
 	 *   	print standard column content
 	 *
@@ -1361,7 +1372,7 @@ class pdf_saumon extends ModelePdfExpedition
 	function printStdColumnContent($pdf, &$curY, $colKey, $columnText = '', $params = array())
 	{
 	    global $hookmanager;
-	    
+
 	    $parameters=array(
 	        'object' => $object,
 	        'curY' =>& $curY,
@@ -1382,10 +1393,10 @@ class pdf_saumon extends ModelePdfExpedition
 	           $pdf->MultiCell( $this->getColumnContentWidth($colKey),2, $columnText,'',$colDef['content']['align']);
 	        }
 	    }
-	    
+
 	}
-	
-	
+
+
 	/**
 	 *   	get column status from column key
 	 *
@@ -1399,14 +1410,14 @@ class pdf_saumon extends ModelePdfExpedition
 	    }
 	    else  return  false;
 	}
-	
+
 	function pdfTabTitles(&$pdf, $tab_top, $tab_height, $outputlangs, $hidetop=0)
 	{
 	    global $hookmanager;
-	    
+
 	    foreach ($this->cols as $colKey => $colDef)
 	    {
-	        
+
 	        $parameters=array(
 	            'colKey' => $colKey,
 	            'pdf' => $pdf,
@@ -1415,7 +1426,7 @@ class pdf_saumon extends ModelePdfExpedition
 	            'tab_height' => $tab_height,
 	            'hidetop' => $hidetop
 	        );
-	        
+
 	        $reshook=$hookmanager->executeHooks('pdfTabTitles',$parameters,$this);    // Note that $object may have been modified by hook
 	        if ($reshook < 0)
 	        {
@@ -1423,32 +1434,32 @@ class pdf_saumon extends ModelePdfExpedition
 	        }
 	        elseif (empty($reshook))
 	        {
-	            
+
 	            if(!$this->getColumnStatus($colKey)) continue;
-	            
+
 	            // get title label
 	            $colDef['title']['label'] = !empty($colDef['title']['label'])?$colDef['title']['label']:$outputlangs->transnoentities($colDef['title']['textkey']);
-	            
+
 	            // Add column separator
 	            if(!empty($colDef['border-left'])){
 	                $pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $tab_height);
 	            }
-	            
+
 	            if (empty($hidetop))
 	            {
 	                $pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
-	                
+
 	                $textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
 	                $pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
-	                
+
 	                $this->tabTitleHeight = max ($pdf->GetY()- $tab_top + $colDef['title']['padding'][2] , $this->tabTitleHeight );
-	                
+
 	            }
-	            
+
 	        }
 	    }
-	    
-	    
+
+
 	    return $this->tabTitleHeight;
 	}
 }
