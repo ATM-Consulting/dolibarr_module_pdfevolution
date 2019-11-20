@@ -66,7 +66,7 @@ class Actionspdfevolution
 
         // Translations
         $langs->loadLangs(array("pdfevolution@pdfevolution"));
-
+        
         $contexts = explode(':',$parameters['context']);
 
 		$def = array(
@@ -101,7 +101,6 @@ class Actionspdfevolution
         }
 
         $pdfDoc->insertNewColumnDef('UnitPriceAfterDiscount', $def, 'discount',1);
-
 
 
         $def = array(
@@ -233,13 +232,8 @@ class Actionspdfevolution
                 $pdfDoc->cols[strtolower($col)]['border-left']        = false;
             }
         }
-
-
-
-
-
-
     }
+    
     /*
      * Overloading the printPDFline function
      *
@@ -273,10 +267,10 @@ class Actionspdfevolution
 
             $sign=1;
             if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
-
+            
             $subprice = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1 ? $object->lines[$i]->multicurrency_subprice : $object->lines[$i]->subprice);
             $subprice = $sign * $subprice;
-
+            
             $celText = '';
             if ($object->lines[$i]->special_code == 3){
                 $celText = '';
@@ -285,8 +279,8 @@ class Actionspdfevolution
                 $subpriceWD = $subprice - ($subprice * $object->lines[$i]->remise_percent / 100) ;
                 $celText = price($subpriceWD, 0, $outputlangs);
             }
-
-
+            
+            
             if(!empty($celText)){
                 $pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'UnitPriceAfterDiscount', $celText );
                 $parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
