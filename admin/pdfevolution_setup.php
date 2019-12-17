@@ -138,7 +138,13 @@ if($conf->global->PRODUCT_USE_UNITS){
 
 $Tcol[] = 'PROGRESS';
 $Tcol[] = 'QTY';
+
+if(!empty($conf->expedition->enabled)){
+	$Tcol[] = 'REF_EXPEDITION';
+}
+
 $Tcol[] = 'TOTALEXCLTAX';
+$Tcol[] = 'TOTALINCLTAX';
 
 
 print '<table class="noborder" width="100%">';
@@ -160,17 +166,17 @@ print '<td  >'.$langs->trans('EnableCol').'</td>';
 foreach ($Tcol as $col){
     $revertonoff = 1;
     $constUsed = 'PDFEVOLUTION_DISABLE_COL_'.$col;
-    
+
     if('UNIT_PRICE_AFTER_DISCOUNT' === $col){
         $revertonoff = 0;
         $constUsed = 'PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT';
     }
 
-    if('REF_FOURN' === $col || 'REF' === $col){
+    if('REF_FOURN' === $col || 'REF' === $col || 'REF_EXPEDITION' === $col){
         $revertonoff = 0;
         $constUsed = 'PDFEVOLUTION_ADD_COL_'.$col;
     }
-    
+
     print '<td class="center" >'.ajax_constantonoff($constUsed, array(), null, $revertonoff).'</td>';
 }
 print '</tr>';
@@ -243,49 +249,49 @@ function _print_input_form_part($confkey, $title = false, $desc ='', $metas = ar
     $var=!$var;
     $inputCount = empty($inputCount)?1:($inputCount+1);
     $form=new Form($db);
-    
+
     $defaultMetas = array(
         'name' => 'value'.$inputCount
     );
-    
+
     if($type!='textarea'){
         $defaultMetas['type']   = 'text';
         $defaultMetas['value']  = $conf->global->{$confkey};
     }
-    
-    
+
+
     $metas = array_merge ($defaultMetas, $metas);
     $metascompil = '';
     foreach ($metas as $key => $values)
     {
         $metascompil .= ' '.$key.'="'.$values.'" ';
     }
-    
-    
+
+
     if($printTableRow)
     {
         print '<tr '.$bc[$var].'>';
         print '<td>';
-        
+
         if(!empty($help)){
             print $form->textwithtooltip( ($title?$title:$langs->trans($confkey)) , $langs->trans($help),2,1,img_help(1,''));
         }
         else {
             print $title?$title:$langs->trans($confkey);
         }
-        
+
         if(!empty($desc))
         {
             print '<br><small>'.$langs->trans($desc).'</small>';
         }
-        
+
         print '</td>';
         print '<td align="center" width="20">&nbsp;</td>';
         print '<td align="right" width="300">';
     }
-        
+
     print '<input type="hidden" name="param'.$inputCount.'" value="'.$confkey.'">';
-    
+
     print '<input type="hidden" name="action" value="setModuleOptions">';
     if($type=='textarea'){
         print '<textarea '.$metascompil.'  >'.dol_htmlentities($conf->global->{$confkey}).'</textarea>';
@@ -293,7 +299,7 @@ function _print_input_form_part($confkey, $title = false, $desc ='', $metas = ar
     else {
         print '<input '.$metascompil.'  />';
     }
-    
+
     if($printTableRow){
         print '</td></tr>';
     }

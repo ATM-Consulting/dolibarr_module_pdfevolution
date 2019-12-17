@@ -245,7 +245,7 @@ class pdf_saumon extends ModelePdfExpedition
 						$tab_top = 88;
 
 						$pdf->SetFont('','', $default_font_size - 1);
-						$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top-1, dol_htmlentitiesbr($desc_incoterms), 0, 1);
+						$pdf->writeHTMLCell(190, 3, $this->marge_gauche, $tab_top-1, dol_htmlentitiesbr($desc_incoterms), 0, 1);
 						$nexY = $pdf->GetY();
 						$height_incoterms=$nexY-$tab_top;
 
@@ -264,7 +264,7 @@ class pdf_saumon extends ModelePdfExpedition
 					$tab_top_alt = $tab_top;
 
 					$pdf->SetFont('','B', $default_font_size - 2);
-					$pdf->writeHTMLCell(60, 4, $this->posxdesc-1, $tab_top-1, $outputlangs->transnoentities("TrackingNumber")." : " . $object->tracking_number, 0, 1, false, true, 'L');
+					$pdf->writeHTMLCell(60, 4, $this->marge_gauche, $tab_top-1, $outputlangs->transnoentities("TrackingNumber")." : " . $object->tracking_number, 0, 1, false, true, 'L');
 
 					$tab_top_alt = $pdf->GetY();
 					//$tab_top_alt += 1;
@@ -289,7 +289,7 @@ class pdf_saumon extends ModelePdfExpedition
 									$label.=$object->tracking_url;
 								}
 								$pdf->SetFont('','B', $default_font_size - 2);
-								$pdf->writeHTMLCell(60, 4, $this->posxdesc-1, $tab_top_alt, $label, 0, 1, false, true, 'L');
+								$pdf->writeHTMLCell(60, 4, $this->marge_gauche, $tab_top_alt, $label, 0, 1, false, true, 'L');
 
 								$tab_top_alt = $pdf->GetY();
 							}
@@ -300,7 +300,7 @@ class pdf_saumon extends ModelePdfExpedition
 					if (! empty($object->note_public))
 					{
 						$pdf->SetFont('','', $default_font_size - 1);   // Dans boucle pour gerer multi-page
-						$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top_alt, dol_htmlentitiesbr($object->note_public), 0, 1);
+						$pdf->writeHTMLCell(190, 3, $this->marge_gauche, $tab_top_alt, dol_htmlentitiesbr($object->note_public), 0, 1);
 					}
 
 					$nexY = $pdf->GetY();

@@ -44,7 +44,10 @@ PDFEVOLUTION_QTY=Quantité
 PDFEVOLUTION_VAT=TVA
 PDFEVOLUTION_REF=REF
 PDFEVOLUTION_REF_FOURN=Référence fournisseur <br/><small>(sur commande fournisseur)</small>
+PDFEVOLUTION_TOTALINCLTAX=Total TTC
 RefFourn=Réf. Fourn
+PDFEVOLUTION_REF_EXPEDITION=Référence expédition <br/><small>(sur facture)</small>
+RefExpedition=Réf. Expédition
 
 # MENU
 TopMenupdfevolution=pdfevolution
