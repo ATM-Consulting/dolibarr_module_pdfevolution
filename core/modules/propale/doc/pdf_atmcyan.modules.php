@@ -72,7 +72,7 @@ class pdf_atmcyan extends ModelePDFPropales
 
 		// Translations
 		foreach (array("main", "bills", "pdfevolution@pdfevolution") as $langFile){ // dolibarr V4 compatibility
-			$langs->loadLang($langFile);
+			$langs->load($langFile);
 		}
 
 
