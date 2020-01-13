@@ -69,9 +69,12 @@ class pdf_atmcyan extends ModelePDFPropales
 	function __construct($db)
 	{
 		global $conf,$langs,$mysoc;
-		
+
 		// Translations
-		$langs->loadLangs(array("main", "bills", "pdfevolution@pdfevolution"));
+		foreach (array("main", "bills", "pdfevolution@pdfevolution") as $langFile){ // dolibarr V4 compatibility
+			$langs->loadLang($langFile);
+		}
+
 
 		$this->db = $db;
 		$this->name = "ATM Cyan";
@@ -108,8 +111,8 @@ class pdf_atmcyan extends ModelePDFPropales
 
 		// Define position of columns
 		$this->posxdesc=$this->marge_gauche+1;
-		
-		
+
+
 		$this->tabTitleHeight = 5; // default height
 
 		$this->tva=array();
@@ -146,7 +149,7 @@ class pdf_atmcyan extends ModelePDFPropales
 		$outputlangs->load("products");
 
 		$nblignes = count($object->lines);
-		
+
 		$hidetop=0;
 		if(!empty($conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE)){
 		    $hidetop=$conf->global->PDFEVOLUTION_DISABLE_COL_HEAD_TITLE;
@@ -293,8 +296,8 @@ class pdf_atmcyan extends ModelePDFPropales
 				        break;
 				    }
 				}
-				
-				
+
+
 
 				// New page
 				$pdf->AddPage();
@@ -315,7 +318,7 @@ class pdf_atmcyan extends ModelePDFPropales
 
 	            $tab_top = 90+$top_shift;
 				$tab_top_newpage = (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)?42+$top_shift:10);
-				
+
 
 				// Incoterm
 				$height_incoterms = 0;
@@ -360,7 +363,7 @@ class pdf_atmcyan extends ModelePDFPropales
 				    if ($tmpuser->email) $notetoshow.=',  Mail: '.$tmpuser->email;
 				    if ($tmpuser->office_phone) $notetoshow.=', Tel: '.$tmpuser->office_phone;
 				}
-				
+
 				$pagenb = $pdf->getPage();
 				if ($notetoshow)
 				{
@@ -368,24 +371,24 @@ class pdf_atmcyan extends ModelePDFPropales
 
 				    $tab_width = $this->page_largeur-$this->marge_gauche-$this->marge_droite;
 				    $pageposbeforenote = $pagenb;
-				    
+
 					$substitutionarray=pdf_getSubstitutionArray($outputlangs, null, $object);
 					complete_substitutions_array($substitutionarray, $outputlangs, $object);
 					$notetoshow = make_substitutions($notetoshow, $substitutionarray, $outputlangs);
 
 
 					$pdf->startTransaction();
-					
+
 					$pdf->SetFont('','', $default_font_size - 1);
 					$pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($notetoshow), 0, 1);
 					// Description
 					$pageposafternote=$pdf->getPage();
 					$posyafter = $pdf->GetY();
-					
+
 					if($pageposafternote>$pageposbeforenote )
 					{
 					    $pdf->rollbackTransaction(true);
-					    
+
 					    // prepar pages to receive notes
 					    while ($pagenb < $pageposafternote) {
 					        $pdf->AddPage();
@@ -397,16 +400,16 @@ class pdf_atmcyan extends ModelePDFPropales
 					        // The only function to edit the bottom margin of current page to set it.
 					        $pdf->setPageOrientation('', 1, $heightforfooter + $heightforfreetext);
 					    }
-					    
+
 					    // back to start
 					    $pdf->setPage($pageposbeforenote);
 					    $pdf->setPageOrientation('', 1, $heightforfooter + $heightforfreetext);
 					    $pdf->SetFont('','', $default_font_size - 1);
 					    $pdf->writeHTMLCell(190, 3, $this->posxdesc-1, $tab_top, dol_htmlentitiesbr($notetoshow), 0, 1);
 					    $pageposafternote=$pdf->getPage();
-					    
+
 					    $posyafter = $pdf->GetY();
-					    
+
 					    if ($posyafter > ($this->page_hauteur - ($heightforfooter+$heightforfreetext+20)))	// There is no space left for total+free text
 					    {
 					        $pdf->AddPage('','',true);
@@ -418,14 +421,14 @@ class pdf_atmcyan extends ModelePDFPropales
 					        $pdf->setPageOrientation('', 1, $heightforfooter + $heightforfreetext);
 					        //$posyafter = $tab_top_newpage;
 					    }
-					    
-					    
+
+
 					    // apply note frame to previus pages
 					    $i = $pageposbeforenote;
 					    while ($i < $pageposafternote) {
 					        $pdf->setPage($i);
-					        
-					        
+
+
 					        $pdf->SetDrawColor(128,128,128);
 					        // Draw note frame
 					        if($i>$pageposbeforenote){
@@ -436,21 +439,21 @@ class pdf_atmcyan extends ModelePDFPropales
 					            $height_note = $this->page_hauteur - ($tab_top + $heightforfooter);
 					            $pdf->Rect($this->marge_gauche, $tab_top-1, $tab_width, $height_note + 1);
 					        }
-					        
+
 					        // Add footer
 					        $pdf->setPageOrientation('', 1, 0);	// The only function to edit the bottom margin of current page to set it.
 					        $this->_pagefoot($pdf,$object,$outputlangs,1);
-					        
+
 					        $i++;
 					    }
-					    
+
 					    // apply note frame to last page
 					    $pdf->setPage($pageposafternote);
 					    if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 					    if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
 					    $height_note=$posyafter-$tab_top_newpage;
 					    $pdf->Rect($this->marge_gauche, $tab_top_newpage-1, $tab_width, $height_note+1);
-					    
+
 					}
 					else // No pagebreak
 					{
@@ -458,8 +461,8 @@ class pdf_atmcyan extends ModelePDFPropales
 					    $posyafter = $pdf->GetY();
 					    $height_note=$posyafter-$tab_top;
 					    $pdf->Rect($this->marge_gauche, $tab_top-1, $tab_width, $height_note+1);
-					    
-					    
+
+
 					    if($posyafter > ($this->page_hauteur - ($heightforfooter+$heightforfreetext+20)) )
 					    {
 					        // not enough space, need to add page
@@ -469,12 +472,12 @@ class pdf_atmcyan extends ModelePDFPropales
 					        $pdf->setPage($pageposafternote);
 					        if (! empty($tplidx)) $pdf->useTemplate($tplidx);
 					        if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
-					        
+
 					        $posyafter = $tab_top_newpage;
 					    }
-					    
+
 					}
-					
+
 					$tab_height = $tab_height - $height_note;
 					$tab_top = $posyafter +6;
 				}
@@ -486,16 +489,16 @@ class pdf_atmcyan extends ModelePDFPropales
 
 				// Use new auto collum system
 				$this->prepareArrayColumnField($object,$outputlangs,$hidedetails,$hidedesc,$hideref);
-				
+
 				// Simulation de tableau pour connaitre la hauteur de la ligne de titre
 				$pdf->startTransaction();
 				$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
 				$pdf->rollbackTransaction(true);
-				
+
 				$iniY = $tab_top + $this->tabTitleHeight + 2;
 				$curY = $tab_top + $this->tabTitleHeight + 2;
 				$nexY = $tab_top + $this->tabTitleHeight + 2;
-				
+
 				// Loop on each lines
 				$pageposbeforeprintlines=$pdf->getPage();
 				$pagenb = $pageposbeforeprintlines;
@@ -526,12 +529,12 @@ class pdf_atmcyan extends ModelePDFPropales
     						if (! empty($tplidx)) $pdf->useTemplate($tplidx);
     						//if (empty($conf->global->MAIN_PDF_DONOTREPEAT_HEAD)) $this->_pagehead($pdf, $object, 0, $outputlangs);
     						$pdf->setPage($pageposbefore+1);
-    
+
     						$curY = $tab_top_newpage;
     						$showpricebeforepagebreak=0;
     					}
-    
-    					
+
+
     					if (!empty($this->cols['photo']) && isset($imglinesize['width']) && isset($imglinesize['height']))
     					{
     						$pdf->Image($realpatharray[$i], $this->getColumnContentXStart('photo'), $curY, $imglinesize['width'], $imglinesize['height'], '', '', '', 2, 300);	// Use 300 dpi
@@ -539,7 +542,7 @@ class pdf_atmcyan extends ModelePDFPropales
     						$posYAfterImage=$curY+$imglinesize['height'];
     					}
 					}
-					
+
 					// Description of product line
 					if($this->getColumnStatus('desc'))
 					{
@@ -553,7 +556,7 @@ class pdf_atmcyan extends ModelePDFPropales
     						//print $pageposafter.'-'.$pageposbefore;exit;
     						$pdf->setPageOrientation('', 1, $heightforfooter);	// The only function to edit the bottom margin of current page to set it.
     						pdf_writelinedesc($pdf,$object,$i,$outputlangs,$this->getColumnContentWidth('desc'),3,$this->getColumnContentXStart('desc'),$curY,$hideref,$hidedesc);
-    
+
     						$pageposafter=$pdf->getPage();
     						$posyafter=$pdf->GetY();
     						//var_dump($posyafter); var_dump(($this->page_hauteur - ($heightforfooter+$heightforfreetext+$heightforinfotot))); exit;
@@ -609,7 +612,7 @@ class pdf_atmcyan extends ModelePDFPropales
 					    $this->printStdColumnContent($pdf, $curY, 'subprice', $up_excl_tax);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
 					// Quantity
 					// Enough for 6 chars
 					if ($this->getColumnStatus('qty'))
@@ -618,8 +621,8 @@ class pdf_atmcyan extends ModelePDFPropales
 					    $this->printStdColumnContent($pdf, $curY, 'qty', $qty);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
-					
+
+
 					// Unit
 					if ($this->getColumnStatus('unit'))
 					{
@@ -627,7 +630,7 @@ class pdf_atmcyan extends ModelePDFPropales
 					    $this->printStdColumnContent($pdf, $curY, 'unit', $unit);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
 					// Discount on line
 					if ($this->getColumnStatus('discount') && $object->lines[$i]->remise_percent)
 					{
@@ -635,7 +638,7 @@ class pdf_atmcyan extends ModelePDFPropales
 					    $this->printStdColumnContent($pdf, $curY, 'discount', $remise_percent);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
+
 					// Total HT line
 					if ($this->getColumnStatus('totalexcltax'))
 					{
@@ -643,8 +646,8 @@ class pdf_atmcyan extends ModelePDFPropales
 					    $this->printStdColumnContent($pdf, $curY, 'totalexcltax', $total_excl_tax);
 					    $nexY = max($pdf->GetY(),$nexY);
 					}
-					
-					
+
+
 					$parameters=array(
 					    'object' => $object,
 					    'i' => $i,
@@ -655,8 +658,8 @@ class pdf_atmcyan extends ModelePDFPropales
 					    'hidedetails' => $hidedetails
 					);
 					$reshook=$hookmanager->executeHooks('printPDFline',$parameters,$this);    // Note that $object may have been modified by hook
-					
-					
+
+
 
 					// Collecte des totaux par valeur de tva dans $this->tva["taux"]=total_tva
 					if ($conf->multicurrency->enabled && $object->multicurrency_tx != 1) $tvaligne=$object->lines[$i]->multicurrency_total_tva;
@@ -1111,7 +1114,7 @@ class pdf_atmcyan extends ModelePDFPropales
 
 		// Get Total HT
 		$total_ht = ($conf->multicurrency->enabled && $object->mylticurrency_tx != 1 ? $object->multicurrency_total_ht : $object->total_ht);
-		
+
 		// Total remise
 		$total_line_remise=0;
 		foreach($object->lines as $i => $line) {
@@ -1126,7 +1129,7 @@ class pdf_atmcyan extends ModelePDFPropales
 		        $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalDiscount"), 0, 'L', 1);
 		        $pdf->SetXY($col2x, $tab2_top + $tab2_hl);
 		        $pdf->MultiCell($largcol2, $tab2_hl, price($total_line_remise, 0, $outputlangs), 0, 'R', 1);
-		        
+
 		        $index++;
 		    }
 		    // Show total NET before discount
@@ -1136,11 +1139,11 @@ class pdf_atmcyan extends ModelePDFPropales
 		        $pdf->MultiCell($col2x-$col1x, $tab2_hl, $outputlangs->transnoentities("TotalHTBeforeDiscount"), 0, 'L', 1);
 		        $pdf->SetXY($col2x, $tab2_top + 0);
 		        $pdf->MultiCell($largcol2, $tab2_hl, price($total_line_remise + $total_ht, 0, $outputlangs), 0, 'R', 1);
-		        
+
 		        $index++;
 		    }
 		}
-		
+
 		// Total HT
 		$pdf->SetFillColor(255,255,255);
 		$pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
@@ -1429,14 +1432,14 @@ class pdf_atmcyan extends ModelePDFPropales
 		// Output Rect
 		$this->printRect($pdf,$this->marge_gauche, $tab_top, $this->page_largeur-$this->marge_gauche-$this->marge_droite, $tab_height, $hidetop, $hidebottom);	// Rect prend une longueur en 3eme param et 4eme param
 
-		
+
 		$this->pdfTabTitles($pdf, $tab_top, $tab_height, $outputlangs, $hidetop);
-		
+
 		if (empty($hidetop)){
 		    $pdf->line($this->marge_gauche, $tab_top+$this->tabTitleHeight, $this->page_largeur-$this->marge_droite, $tab_top+$this->tabTitleHeight);	// line prend une position y en 2eme param et 4eme param
 		}
 
-		
+
 	}
 
 	/**
@@ -1711,8 +1714,8 @@ class pdf_atmcyan extends ModelePDFPropales
 
 		return ($tab_hl*7);
 	}
-	
-	
+
+
 	/**
 	 *   	Define Array Column Field
 	 *
@@ -1724,21 +1727,21 @@ class pdf_atmcyan extends ModelePDFPropales
 	 *      @return	null
 	 */
 	function defineColumnField($object,$outputlangs,$hidedetails=0,$hidedesc=0,$hideref=0){
-	    
+
 	    global $conf, $hookmanager;
-	    
+
 	    // Default field style for content
 	    $this->defaultContentsFieldsStyle = array(
 	        'align' => 'R', // R,C,L
 	        'padding' => array(0.5,0.5,0.5,0.5), // Like css 0 => top , 1 => right, 2 => bottom, 3 => left
 	    );
-	    
+
 	    // Default field style for content
 	    $this->defaultTitlesFieldsStyle = array(
 	        'align' => 'C', // R,C,L
 	        'padding' => array(0.5,0,0.5,0), // Like css 0 => top , 1 => right, 2 => bottom, 3 => left
 	    );
-	    
+
 	    /*
 	     * For exemple
 	     $this->cols['theColKey'] = array(
@@ -1756,7 +1759,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	     ),
 	     );
 	     */
-	    
+
 	    $rank=0; // do not use negative rank
 	    $this->cols['desc'] = array(
 	        'rank' => $rank,
@@ -1773,7 +1776,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	            'align' => 'L',
 	        ),
 	    );
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['photo'] = array(
 	        'rank' => $rank,
@@ -1788,13 +1791,13 @@ class pdf_atmcyan extends ModelePDFPropales
 	        ),
 	        'border-left' => false, // remove left line separator
 	    );
-	    
+
 	    if (! empty($conf->global->MAIN_GENERATE_PROPOSALS_WITH_PICTURE) && !empty($this->atleastonephoto))
 	    {
 	        $this->cols['photo']['status'] = true;
 	    }
-	    
-	    
+
+
 	    $rank = $rank + 10;
 	    $this->cols['vat'] = array(
 	        'rank' => $rank,
@@ -1805,12 +1808,12 @@ class pdf_atmcyan extends ModelePDFPropales
 	        ),
 	        'border-left' => true, // add left line separator
 	    );
-	    
+
 	    if (empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT) && empty($conf->global->MAIN_GENERATE_DOCUMENTS_WITHOUT_VAT_COLUMN))
 	    {
 	        $this->cols['vat']['status'] = true;
 	    }
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['subprice'] = array(
 	        'rank' => $rank,
@@ -1821,7 +1824,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	        ),
 	        'border-left' => true, // add left line separator
 	    );
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['qty'] = array(
 	        'rank' => $rank,
@@ -1832,7 +1835,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	        ),
 	        'border-left' => true, // add left line separator
 	    );
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['progress'] = array(
 	        'rank' => $rank,
@@ -1843,12 +1846,12 @@ class pdf_atmcyan extends ModelePDFPropales
 	        ),
 	        'border-left' => false, // add left line separator
 	    );
-	    
+
 	    if($this->situationinvoice)
 	    {
 	        $this->cols['progress']['status'] = true;
 	    }
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['unit'] = array(
 	        'rank' => $rank,
@@ -1862,7 +1865,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	    if($conf->global->PRODUCT_USE_UNITS){
 	        $this->cols['unit']['status'] = true;
 	    }
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['discount'] = array(
 	        'rank' => $rank,
@@ -1876,7 +1879,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	    if ($this->atleastonediscount){
 	        $this->cols['discount']['status'] = true;
 	    }
-	    
+
 	    $rank = $rank + 10;
 	    $this->cols['totalexcltax'] = array(
 	        'rank' => $rank,
@@ -1887,8 +1890,8 @@ class pdf_atmcyan extends ModelePDFPropales
 	        ),
 	        'border-left' => true, // add left line separator
 	    );
-	    
-	    
+
+
 	    $parameters=array(
 	        'object' => $object,
 	        'outputlangs' => $outputlangs,
@@ -1896,7 +1899,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	        'hidedesc' => $hidedesc,
 	        'hideref' => $hideref
 	    );
-	    
+
 	    $reshook=$hookmanager->executeHooks('defineColumnField',$parameters,$this);    // Note that $object may have been modified by hook
 	    if ($reshook < 0)
 	    {
@@ -1910,19 +1913,19 @@ class pdf_atmcyan extends ModelePDFPropales
 	    {
 	        $this->cols = $hookmanager->resArray;
 	    }
-	    
+
 	}
-	
-	
-	
-	
+
+
+
+
 	/*
 	 *
 	 * DEBUT PARTIE NORMALEMENT DANS LA CLASSE CommonDocGenerator
 	 *
 	 *
 	 */
-	
+
 	/**
 	 *   	uasort callback function to Sort colums fields
 	 *
@@ -1931,16 +1934,16 @@ class pdf_atmcyan extends ModelePDFPropales
 	 *      @return	int								Return compare result
 	 */
 	function columnSort($a, $b) {
-	    
+
 	    if(empty($a['rank'])){ $a['rank'] = 0; }
 	    if(empty($b['rank'])){ $b['rank'] = 0; }
 	    if ($a['rank'] == $b['rank']) {
 	        return 0;
 	    }
 	    return ($a['rank'] > $b['rank']) ? -1 : 1;
-	    
+
 	}
-	
+
 	/**
 	 *   	Prepare Array Column Field
 	 *
@@ -1952,33 +1955,33 @@ class pdf_atmcyan extends ModelePDFPropales
 	 *      @return	null
 	 */
 	function prepareArrayColumnField($object,$outputlangs,$hidedetails=0,$hidedesc=0,$hideref=0){
-	    
+
 	    global $conf;
-	    
+
 	    $this->defineColumnField($object,$outputlangs,$hidedetails,$hidedesc,$hideref);
-	    
-	    
+
+
 	    // Sorting
 	    uasort ( $this->cols, array( $this, 'columnSort' ) );
-	    
+
 	    // Positionning
 	    $curX = $this->page_largeur-$this->marge_droite; // start from right
-	    
+
 	    // Array witdh
 	    $arrayWidth = $this->page_largeur-$this->marge_droite-$this->marge_gauche;
-	    
+
 	    // Count flexible column
 	    $totalDefinedColWidth = 0;
 	    $countFlexCol = 0;
 	    foreach ($this->cols as $colKey =>& $colDef)
 	    {
 	        if(!$this->getColumnStatus($colKey)) continue; // continue if desable
-	        
+
 	        if(!empty($colDef['scale'])){
 	            // In case of column widht is defined by percentage
 	            $colDef['width'] = abs($arrayWidth * $colDef['scale'] / 100 );
 	        }
-	        
+
 	        if(empty($colDef['width'])){
 	            $countFlexCol++;
 	        }
@@ -1986,7 +1989,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	            $totalDefinedColWidth += $colDef['width'];
 	        }
 	    }
-	    
+
 	    foreach ($this->cols as $colKey =>& $colDef)
 	    {
 	        // setting empty conf with default
@@ -1996,7 +1999,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	        else{
 	            $colDef['title'] = $this->defaultTitlesFieldsStyle;
 	        }
-	        
+
 	        // setting empty conf with default
 	        if(!empty($colDef['content'])){
 	            $colDef['content'] = array_replace($this->defaultContentsFieldsStyle, $colDef['content']);
@@ -2004,14 +2007,14 @@ class pdf_atmcyan extends ModelePDFPropales
 	        else{
 	            $colDef['content'] = $this->defaultContentsFieldsStyle;
 	        }
-	        
+
 	        if($this->getColumnStatus($colKey))
 	        {
 	            // In case of flexible column
 	            if(empty($colDef['width'])){
 	                $colDef['width'] = abs(($arrayWidth - $totalDefinedColWidth)) / $countFlexCol;
 	            }
-	            
+
 	            // Set positions
 	            $lastX = $curX;
 	            $curX = $lastX - $colDef['width'];
@@ -2020,7 +2023,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	        }
 	    }
 	}
-	
+
 	/**
 	 *   	get column content width from column key
 	 *
@@ -2032,8 +2035,8 @@ class pdf_atmcyan extends ModelePDFPropales
 	    $colDef = $this->cols[$colKey];
 	    return  $colDef['width'] - $colDef['content']['padding'][3] - $colDef['content']['padding'][1];
 	}
-	
-	
+
+
 	/**
 	 *   	get column content X (abscissa) left position from column key
 	 *
@@ -2045,7 +2048,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	    $colDef = $this->cols[$colKey];
 	    return  $colDef['xStartPos'] + $colDef['content']['padding'][3];
 	}
-	
+
 	/**
 	 *   	get column position rank from column key
 	 *
@@ -2057,7 +2060,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	    if(!isset($this->cols[$colKey]['rank'])) return -1;
 	    return  $this->cols[$colKey]['rank'];
 	}
-	
+
 	/**
 	 *   	get column position rank from column key
 	 *
@@ -2071,21 +2074,21 @@ class pdf_atmcyan extends ModelePDFPropales
 	{
 	    // prepare wanted rank
 	    $rank = -1;
-	    
+
 	    // try to get rank from target column
 	    if(!empty($targetCol)){
 	        $rank = $this->getColumnRank($targetCol);
 	        if($rank>=0 && $insertAfterTarget){ $rank++; }
 	    }
-	    
+
 	    // get rank from new column definition
 	    if($rank<0 && !empty($defArray['rank'])){
 	        $rank = $defArray['rank'];
 	    }
-	    
+
 	    // error: no rank
 	    if($rank<0){ return -1; }
-	    
+
 	    foreach ($this->cols as $colKey =>& $colDef)
 	    {
 	        if( $rank <= $colDef['rank'])
@@ -2093,14 +2096,14 @@ class pdf_atmcyan extends ModelePDFPropales
 	            $colDef['rank'] = $colDef['rank'] + 1;
 	        }
 	    }
-	    
+
 	    $defArray['rank'] = $rank;
 	    $this->cols[$newColKey] = $defArray; // array_replace is used to preserve keys
-	    
+
 	    return $rank;
 	}
-	
-	
+
+
 	/**
 	 *   	print standard column content
 	 *
@@ -2113,7 +2116,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	function printStdColumnContent($pdf, &$curY, $colKey, $columnText = '')
 	{
 	    global $hookmanager;
-	    
+
 	    $parameters=array(
 	        'object' => $object,
 	        'curY' =>& $curY,
@@ -2129,10 +2132,10 @@ class pdf_atmcyan extends ModelePDFPropales
 	        $colDef = $this->cols[$colKey];
 	        $pdf->MultiCell( $this->getColumnContentWidth($colKey),2, $columnText,'',$colDef['content']['align']);
 	    }
-	    
+
 	}
-	
-	
+
+
 	/**
 	 *   	get column status from column key
 	 *
@@ -2146,14 +2149,14 @@ class pdf_atmcyan extends ModelePDFPropales
 	    }
 	    else  return  false;
 	}
-	
+
 	function pdfTabTitles(&$pdf, $tab_top, $tab_height, $outputlangs, $hidetop=0)
 	{
 	    global $hookmanager;
-	    
+
 	    foreach ($this->cols as $colKey => $colDef)
 	    {
-	        
+
 	        $parameters=array(
 	            'colKey' => $colKey,
 	            'pdf' => $pdf,
@@ -2162,7 +2165,7 @@ class pdf_atmcyan extends ModelePDFPropales
 	            'tab_height' => $tab_height,
 	            'hidetop' => $hidetop
 	        );
-	        
+
 	        $reshook=$hookmanager->executeHooks('pdfTabTitles',$parameters,$this);    // Note that $object may have been modified by hook
 	        if ($reshook < 0)
 	        {
@@ -2170,33 +2173,33 @@ class pdf_atmcyan extends ModelePDFPropales
 	        }
 	        elseif (empty($reshook))
 	        {
-	            
+
 	            if(!$this->getColumnStatus($colKey)) continue;
-	            
+
 	            // get title label
 	            $colDef['title']['label'] = !empty($colDef['title']['label'])?$colDef['title']['label']:$outputlangs->transnoentities($colDef['title']['textkey']);
-	            
+
 	            // Add column separator
 	            if(!empty($colDef['border-left'])){
 	                $pdf->line($colDef['xStartPos'], $tab_top, $colDef['xStartPos'], $tab_top + $tab_height);
 	            }
-	            
+
 	            if (empty($hidetop))
 	            {
 	                $pdf->SetXY($colDef['xStartPos'] + $colDef['title']['padding'][3], $tab_top + $colDef['title']['padding'][0] );
-	                
+
 	                $textWidth = $colDef['width'] - $colDef['title']['padding'][3] -$colDef['title']['padding'][1];
 	                $pdf->MultiCell($textWidth,2,$colDef['title']['label'],'',$colDef['title']['align']);
-	                
+
 	                $this->tabTitleHeight = max ($pdf->GetY()- $tab_top + $colDef['title']['padding'][2] , $this->tabTitleHeight );
-	                
+
 	            }
-	            
+
 	        }
 	    }
-	    
-	    
+
+
 	    return $this->tabTitleHeight;
 	}
-	
+
 }
