@@ -227,12 +227,18 @@ class pdf_atmcyan extends ModelePDFPropales
 			if ($object->specimen)
 			{
 				$dir = $conf->propal->multidir_output[$conf->entity];
+				if(doubleval(DOL_VERSION) <=4){
+					$dir = $conf->propal->dir_output;
+				}
 				$file = $dir . "/SPECIMEN.pdf";
 			}
 			else
 			{
 				$objectref = dol_sanitizeFileName($object->ref);
 				$dir = $conf->propal->multidir_output[$object->entity] . "/" . $objectref;
+				if(doubleval(DOL_VERSION) <=4){
+					$dir = $conf->propal->dir_output . "/" . $objectref;
+				}
 				$file = $dir . "/" . $objectref . ".pdf";
 			}
 
