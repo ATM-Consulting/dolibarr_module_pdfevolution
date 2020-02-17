@@ -140,7 +140,12 @@ class pdf_atmsponge extends ModelePDFFactures
 	public function __construct($db)
 	{
 		global $conf,$langs,$mysoc;
-		
+
+		// for retro compatibility
+		if(!empty($conf->global->INVOICE_USE_SITUATION_RETAINED_WARRANTY)) {
+			$conf->global->INVOICE_USE_RETAINED_WARRANTY = $conf->global->INVOICE_USE_SITUATION_RETAINED_WARRANTY;
+		}
+
 		// Translations
 		$langs->loadLangs(array("main", "bills", "pdfevolution@pdfevolution"));
 
@@ -1638,31 +1643,49 @@ class pdf_atmsponge extends ModelePDFFactures
 				
 				
 				// Retained warranty
-				if( !empty($object->situation_final) &&  ( $object->type == Facture::TYPE_SITUATION && (!empty($object->retained_warranty) ) ) )
-				{
-				    $displayWarranty = false;
-				    // Check if this situation invoice is 100% for real
-				    if(!empty($object->situation_final)){
-				        $displayWarranty = true;
-				    }
-				    elseif(!empty($object->lines) && $object->status == Facture::STATUS_DRAFT ){
-				        // $object->situation_final need validation to be done so this test is need for draft
-				        $displayWarranty = true;
-				        foreach( $object->lines as $i => $line ){
-				            if($line->product_type < 2 && $line->situation_percent < 100){
-				                $displayWarranty = false;
-				                break;
-				            }
-				        }
-				    }
-				    
-				    if($displayWarranty){
-				        $pdf->SetTextColor(40,40,40);
-				        $pdf->SetFillColor(255,255,255);
+				if(empty($conf->global->USE_RETAINED_WARRANTY_ONLY_FOR_SITUATION)){
+					$RetainedWarrantyInvoiceAvailableType = array( Facture::TYPE_SITUATION, Facture::TYPE_STANDARD);
+				}else{
+					$RetainedWarrantyInvoiceAvailableType = array( Facture::TYPE_SITUATION );
+				}
 
-				        $retainedWarranty = $total_a_payer_ttc * $object->retained_warranty / 100;
+				if( in_array($object->type, $RetainedWarrantyInvoiceAvailableType)
+					|| ((!empty($object->situation_final) || empty($conf->global->USE_RETAINED_WARRANTY_ONLY_FOR_SITUATION_FINAL))  &&  ( $object->type == Facture::TYPE_SITUATION && !empty($object->retained_warranty)))
+				)
+				{
+					$displayWarranty = false;
+					if(!empty($object->retained_warranty)) {
+						$displayWarranty = true;
+
+						if ($object->type == Facture::TYPE_SITUATION && !empty($conf->global->USE_RETAINED_WARRANTY_ONLY_FOR_SITUATION_FINAL)) {
+							// Check if this situation invoice is 100% for real
+							$displayWarranty = false;
+							if (!empty($object->situation_final)) {
+								$displayWarranty = true;
+							} elseif (!empty($object->lines) && $object->status == Facture::STATUS_DRAFT) {
+								// $object->situation_final need validation to be done so this test is need for draft
+								$displayWarranty = true;
+								foreach ($object->lines as $i => $line) {
+									if ($line->product_type < 2 && $line->situation_percent < 100) {
+										$displayWarranty = false;
+										break;
+									}
+								}
+							}
+						}
+					}
+				    
+				    if($displayWarranty) {
+						$pdf->SetTextColor(40, 40, 40);
+						$pdf->SetFillColor(255, 255, 255);
+
+						if ($object->type == Facture::TYPE_SITUATION && !empty($conf->global->USE_RETAINED_WARRANTY_ONLY_FOR_SITUATION_FINAL)) {
+							$retainedWarranty = $total_a_payer_ttc * $object->retained_warranty / 100;
+						}
+						else{
+							$retainedWarranty = $total_ttc * $object->retained_warranty / 100;
+						}
 				        $billedWithRetainedWarranty = $object->total_ttc - $retainedWarranty ;
-				        
 				        // Billed - retained warranty
 				        $index++;
 				        $pdf->SetXY($col1x, $tab2_top + $tab2_hl * $index);
