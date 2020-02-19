@@ -1679,12 +1679,22 @@ class pdf_atmsponge extends ModelePDFFactures
 						$pdf->SetTextColor(40, 40, 40);
 						$pdf->SetFillColor(255, 255, 255);
 
-						if ($object->type == Facture::TYPE_SITUATION && !empty($conf->global->USE_RETAINED_WARRANTY_ONLY_FOR_SITUATION_FINAL)) {
-							$retainedWarranty = $total_a_payer_ttc * $object->retained_warranty / 100;
+						if(is_callable(array($object, 'getRetainedWarrantyAmount'))){
+							$retainedWarranty = $object->getRetainedWarrantyAmount();
 						}
 						else{
-							$retainedWarranty = $total_ttc * $object->retained_warranty / 100;
+							// for retrocompatibility
+							if ($object->type == Facture::TYPE_SITUATION && !empty($conf->global->USE_RETAINED_WARRANTY_ONLY_FOR_SITUATION_FINAL)) {
+								$retainedWarranty = $total_a_payer_ttc * $object->retained_warranty / 100;
+							}
+							else{
+								$retainedWarranty = $total_ttc * $object->retained_warranty / 100;
+							}
+
+							$rounding=min($conf->global->MAIN_MAX_DECIMALS_UNIT,$conf->global->MAIN_MAX_DECIMALS_TOT);
+							$retainedWarranty = round($retainedWarranty, $rounding);
 						}
+
 				        $billedWithRetainedWarranty = $object->total_ttc - $retainedWarranty ;
 				        // Billed - retained warranty
 				        $index++;
