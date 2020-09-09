@@ -96,3 +96,4 @@ PDFEVOLToPayOn=A payer le %s
 PDFEVOLtoPayOn=à payer le %s
 PDFEVOLRetainedWarranty=Retenue de garantie
 
+DocumentModelStorm = Modèle de Document issue du module PDF Evolution
