@@ -118,7 +118,7 @@ $Tcol[] = 'REF';
 // commande fourn
 $Tcol[] = 'REF_FOURN';
 
-if (! empty($conf->global->MAIN_GENERATE_INVOICES_WITH_PICTURE) && !empty($this->atleastonephoto))
+if (! empty($conf->global->MAIN_GENERATE_INVOICES_WITH_PICTURE) )
 {
     $Tcol[] = 'PHOTO';
 }
