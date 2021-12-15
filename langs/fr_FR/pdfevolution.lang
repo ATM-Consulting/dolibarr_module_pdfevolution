@@ -20,6 +20,10 @@ PDFEVOLUTION_ADD_UNIT_PRICE_AFTER_DISCOUNT=Ajouter une colonne prix unitaire apr
 MAIN_SHOW_AMOUNT_DISCOUNT=Afficher le montant des réductions dans la zone des totaux
 MAIN_SHOW_AMOUNT_BEFORE_DISCOUNT=Afficher le montant total avant réductions dans la zone des totaux
 UnitPriceAfterDiscount=P.U. HT R.
+MAIN_GENERATE_EXCEL_FILE_FOR_DOCUMENT = Générer en parallèle un document Excel lors de la génération PDF
+MAIN_GENERATE_EXCEL_FILE_FOR_DOCUMENT_HELP = Cette option existe à des fins de deboguage, elle permet de générer un fichier exel en plus du fichier PDF
+SetupOptions = Configurations génériques
+SetupModelPDFOptions = Configurations liées au modèles PDF
 
 PDFEVOLUTION_DISABLE_COL_TOTALEXCLTAX=Ne pas afficher la colonne "Total HT"
 PDFEVOLUTION_DISABLE_COL_DISCOUNT=Ne pas afficher la colonne "Reduction"

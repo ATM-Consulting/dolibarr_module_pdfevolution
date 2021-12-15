@@ -69,10 +69,10 @@ dol_fiche_head(
     $head,
     'settings',
     $langs->trans("Module104085Name"),
-    0,
+    -1,
     "pdfevolution@pdfevolution"
 );
-
+dol_fiche_end(-1);
 // Setup page goes here
 $form=new Form($db);
 $var=false;
@@ -89,6 +89,11 @@ print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
 
 print '<table class="noborder" width="100%">';
 
+_print_title('SetupOptions');
+
+_print_on_off('MAIN_GENERATE_EXCEL_FILE_FOR_DOCUMENT');
+
+_print_title('SetupModelPDFOptions');
 _print_on_off('PDFEVOLUTION_DISABLE_COL_HEAD_TITLE');
 _print_on_off('MAIN_SHOW_AMOUNT_DISCOUNT');
 _print_on_off('MAIN_SHOW_AMOUNT_BEFORE_DISCOUNT');
@@ -225,21 +230,64 @@ function _updateBtn(){
 
 
 
-function _print_on_off($confkey, $title = false, $desc ='')
+/**
+ * yes / no select
+ * @param string $confkey
+ * @param string $title
+ * @param string $desc
+ * @param $ajaxConstantOnOffInput will be send to ajax_constantonoff() input param
+ *
+ * exemple _print_on_off('CONSTNAME', 'ParamLabel' , 'ParamDesc');
+ */
+function _print_on_off($confkey, $title = false, $desc ='', $help = false, $width = 300, $forcereload = false, $ajaxConstantOnOffInput = array())
 {
-    global $var, $bc, $langs;
-    $var=!$var;
-    print '<tr '.$bc[$var].'>';
-    print '<td>'.($title?$title:$langs->trans($confkey));
-    if(!empty($desc))
-    {
-        print '<br><small>'.$langs->trans($desc).'</small>';
-    }
-    print '</td>';
-    print '<td align="center" width="20">&nbsp;</td>';
-    print '<td align="right" width="300">';
-    print ajax_constantonoff($confkey);
-    print '</td></tr>';
+	global $var, $bc, $langs, $conf, $form;
+	$var=!$var;
+
+	print '<tr '.$bc[$var].'>';
+	print '<td>';
+
+
+	if(empty($help) && !empty($langs->tab_translate[$confkey . '_HELP'])){
+		$help = $confkey . '_HELP';
+	}
+
+	if(!empty($help)){
+		print $form->textwithtooltip( ($title?$title:$langs->trans($confkey)) , $langs->trans($help),2,1,img_help(1,''));
+	}
+	else {
+		print $title?$title:$langs->trans($confkey);
+	}
+
+	if(!empty($desc))
+	{
+		print '<br><small>'.$langs->trans($desc).'</small>';
+	}
+	print '</td>';
+	print '<td align="center" width="20">&nbsp;</td>';
+	print '<td align="center" width="'.$width.'">';
+
+	if($forcereload){
+		$link = $_SERVER['PHP_SELF'].'?action=set_'.$confkey.'&token='.$_SESSION['newtoken'].'&'.$confkey.'='.intval((empty($conf->global->{$confkey})));
+		$toggleClass = empty($conf->global->{$confkey})?'fa-toggle-off':'fa-toggle-on font-status4';
+		print '<a href="'.$link.'" ><span class="fas '.$toggleClass.' marginleftonly" style=" color: #999;"></span></a>';
+	}
+	else{
+		print ajax_constantonoff($confkey, $ajaxConstantOnOffInput);
+	}
+	print '</td></tr>';
+}
+
+/**
+ * Display title
+ * @param string $title
+ */
+function _print_title($title="")
+{
+	global $langs;
+	print '<tr class="liste_titre">';
+	print '<th colspan="3">'.$langs->trans($title).'</th>'."\n";
+	print '</tr>';
 }
 
 
