@@ -66,7 +66,7 @@ class Actionspdfevolution
 
         // Translations
         $langs->loadLangs(array("pdfevolution@pdfevolution"));
-        
+
         $contexts = explode(':',$parameters['context']);
 
 		$def = array(
@@ -233,8 +233,8 @@ class Actionspdfevolution
             }
         }
     }
-    
-    /*
+
+    /**
      * Overloading the printPDFline function
      *
      * @param   array()         $parameters     Hook metadatas (context, etc...)
@@ -267,10 +267,10 @@ class Actionspdfevolution
 
             $sign=1;
             if (isset($object->type) && $object->type == 2 && ! empty($conf->global->INVOICE_POSITIVE_CREDIT_NOTE)) $sign=-1;
-            
+
             $subprice = ($conf->multicurrency->enabled && $object->multicurrency_tx != 1 ? $object->lines[$i]->multicurrency_subprice : $object->lines[$i]->subprice);
             $subprice = $sign * $subprice;
-            
+
             $celText = '';
             if ($object->lines[$i]->special_code == 3){
                 $celText = '';
@@ -279,8 +279,8 @@ class Actionspdfevolution
                 $subpriceWD = $subprice - ($subprice * $object->lines[$i]->remise_percent / 100) ;
                 $celText = price($subpriceWD, 0, $outputlangs);
             }
-            
-            
+
+
             if(!empty($celText)){
                 $pdfDoc->printStdColumnContent($pdf, $parameters['curY'], 'UnitPriceAfterDiscount', $celText );
                 $parameters['nexY'] = max($pdf->GetY(),$parameters['nexY']);
@@ -376,4 +376,35 @@ class Actionspdfevolution
 
         return $returnVal;
     }
+
+
+	/**
+	 * Overloading the printPDFline function
+	 *
+	 * @param   array()         $parameters     Hook metadatas (context, etc...)
+	 * @param   CommonObject    $object         The object to process (an invoice if you are in invoice module, a propale in propale's module, etc...)
+	 * @param   string          $action         Current action (if set). Generally create or edit or null
+	 * @param   HookManager     $hookmanager    Hook manager propagated to allow calling another hook
+	 * @return  int                             < 0 on error, 0 on success, 1 to replace standard code
+	 */
+	public function afterPDFCreation($parameters, &$pdfObject, &$action, $hookmanager){
+		global $conf;
+		$object = $parameters['object'];
+		/**
+		 * GENERATION DU FICHIER EXCEL
+		 */
+		if(!empty($conf->global->MAIN_GENERATE_EXCEL_FILE_FOR_DOCUMENT )
+			&& ($object->element == 'propal'
+				|| $object->element == 'commande'
+				|| $object->element == 'order_supplier'
+				|| $object->element == 'supplier_proposal'
+				|| $object->element == 'facture'
+			)
+		)
+		{
+			include_once __DIR__ . '/excelDoc.class.php';
+			$excelDoc = new ExcelDoc();
+			$excelDoc->generateExcelFile($object, $pdfObject, $parameters['outputlangs'], $parameters['file']);
+		}
+	}
 }

@@ -1,0 +1,18 @@
+# EXPORT EXCEL
+excelCol_ref=Ref
+excelCol_desc=Description
+excelCol_subpriceWithReduction=Prix unitaire remisé
+excelCol_type=Type
+excelCol_qty=Quantité
+excelCol_totalHT=Total HT
+excelCol_tva=TVA %%
+excelCol_totalTVA=Total TVA
+excelCol_totalTTC=Total TTC
+excelCol_LineUniqueId=#Uid
+excelDisclamer=Ce document n'est pas contractuel, il n'a vocation qu'à la facilitation à la saisie informatique, se référer à la version PDF.
+excelCol_progress = Progr
+excelCol_prev_progress = Prev Progr
+excelCol_new_progress = New Progr
+excelCol_total_progress = Total Progr
+excelCol_subprice = Prix unitaire
+excelCol_reduction = Remise
