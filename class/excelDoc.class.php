@@ -84,7 +84,7 @@ class ExcelDoc {
 					->setLastModifiedBy($user->name)
 					->setTitle($pdfObject->emetteur->name.' '.$documentName.' '.$object->ref)
 					->setSubject("Office 2007 XLSX ".$pdfObject->emetteur->name.' '.$documentName)
-					->setDescription("EDI Documment auto generated")
+					->setDescription("Dolibarr Documment auto generated")
 					->setKeywords($pdfObject->emetteur->name.' '.$documentName.' '.$object->ref)
 					->setCategory($documentName);
 
@@ -185,14 +185,6 @@ class ExcelDoc {
 					$sheet->getRowDimension($l)->setRowHeight($styleTitleRowHeight);
 				}
 
-				if($object->element != 'order_supplier' && $object->element != 'supplier_proposal') {
-					$l++;
-					// add values Chantier
-					$sheet->setCellValue('A' . $l, $langs->transnoentities('Chantier'));
-					if (!empty($object->array_options['options_chantier'])) {
-						$sheet->setCellValue('B' . $l, $object->array_options['options_chantier']);
-					}
-				}
 
 				$l++;
 				// add values
@@ -290,33 +282,6 @@ class ExcelDoc {
 				else{
 					$l = $l +2;
 				}
-
-
-				//
-				// $object->date_validation
-				// $object->fin_validite
-				// $object->cond_reglement_code
-				// $object->mode_reglement_code
-				// $object->availability_code
-
-				// $object->labelstatut_short[$object->status]
-				// $object->multicurrency_code
-
-				// $object->thirdparty
-				/*
-				 * code_client
-				  public 'particulier' => null
-				  public 'status'
-				  public 'state_id'
-				  public 'state_code'
-				  public 'state'
-				  public 'departement_code'
-				  public 'departement'
-				  public 'pays'
-				  public 'phone'
-				  public 'fax'
-				  public 'email'
-				 */
 
 				$l = 18; // start line number for object lines
 
