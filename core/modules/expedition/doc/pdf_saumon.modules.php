@@ -1088,7 +1088,7 @@ class pdf_saumon extends ModelePdfExpedition
 	    $this->cols['weight'] = array(
 	        'rank' => $rank,
 	        'width' => 30, // in mm
-	        'status' => true,
+	        'status' => false,
 	        'title' => array(
 	            'textkey' => 'WeightVolShort'
 	        ),
