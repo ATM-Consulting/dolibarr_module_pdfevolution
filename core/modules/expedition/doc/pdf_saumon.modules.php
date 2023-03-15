@@ -263,15 +263,16 @@ class pdf_saumon extends ModelePdfExpedition
 					$tab_top = 88 + $height_incoterms;
 					$tab_top_alt = $tab_top;
 
-					$pdf->SetFont('','B', $default_font_size - 2);
-					$pdf->writeHTMLCell(60, 4, $this->marge_gauche, $tab_top-1, $outputlangs->transnoentities("TrackingNumber")." : " . $object->tracking_number, 0, 1, false, true, 'L');
 
-					$tab_top_alt = $pdf->GetY();
 					//$tab_top_alt += 1;
 
 					// Tracking number
 					if (! empty($object->tracking_number))
 					{
+						$pdf->SetFont('','B', $default_font_size - 2);
+						$pdf->writeHTMLCell(60, 4, $this->marge_gauche, $tab_top-1, $outputlangs->transnoentities("TrackingNumber")." : " . $object->tracking_number, 0, 1, false, true, 'L');
+						$tab_top_alt = $pdf->GetY();
+
 						$object->GetUrlTrackingStatus($object->tracking_number);
 						if (! empty($object->tracking_url))
 						{
